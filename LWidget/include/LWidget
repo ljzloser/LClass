@@ -1,0 +1,7 @@
+#include "LComboBox.h"
+#include "LWidget.h"
+#include "LButton.h"
+#include "LInstrumentBoard.h"
+#include "LGraphicsEffect.h"
+#include "LTextEdit.h"
+using namespace ljz;
