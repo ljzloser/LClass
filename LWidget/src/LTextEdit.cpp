@@ -5,6 +5,10 @@
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <LCore>
+#include <QTableView>
+#include <QAbstractItemModel>
+
 using namespace ljz;
 
 LFindItemDialog::LFindItemDialog(QWidget* parent)
@@ -12,6 +16,7 @@ LFindItemDialog::LFindItemDialog(QWidget* parent)
 {
 	auto layout = new QVBoxLayout();
 	layout->addWidget(_tableView);
+	layout->addWidget(_label);
 	this->setLayout(layout);
 	this->setWindowIcon(QIcon(":/res/res/searchResult.png"));
 	this->setWindowTitle("搜索结果");
@@ -34,7 +39,7 @@ LFindItemDialog::LFindItemDialog(QWidget* parent)
 		});
 }
 
-void LFindItemDialog::setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps)
+void LFindItemDialog::setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps) const
 {
 	QStandardItemModel* model = new QStandardItemModel(_tableView);
 	model->setHorizontalHeaderLabels(keys);
@@ -46,15 +51,17 @@ void LFindItemDialog::setItemInfos(const QStringList& keys, const QList<QVariant
 			auto item = new QStandardItem(map.value(key).toString());
 			if (key == "内容")
 				item->setData(map, Qt::UserRole + 1);
+			else
+				item->setText(QString::number(map.value(key).toInt() + 1));
 			list.append(item);
 		}
 		model->appendRow(list);
 	}
 	_tableView->setModel(model);
+	_label->setText(QString("共搜索到%1条").arg(maps.size()));
 }
 
-void LFindItemDialogDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
-	const QModelIndex& index) const
+void LFindItemDialogDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QVariant data = index.data(Qt::UserRole + 1);
 	// 判断data是否有值
@@ -66,9 +73,9 @@ void LFindItemDialogDelegate::paint(QPainter* painter, const QStyleOptionViewIte
 		{
 			int from = map.value("开始位置").toInt();
 			int to = map.value("结束位置").toInt();
-			QString left = content.left(from);
-			QString mid = content.mid(from, to - from);
-			QString right = content.right(content.length() - to);
+			QString left = content.left(from).toHtmlEscaped();
+			QString mid = content.mid(from, to - from).toHtmlEscaped();
+			QString right = content.right(content.length() - to).toHtmlEscaped();
 			QString highlightText = QString(R"(<span>%1</span><span style="background-color: yellow;">%2</span><span>%3</span>)")
 				.arg(LFunc::replaceSpaceToHtml(left))
 				.arg(LFunc::replaceSpaceToHtml(mid))
@@ -108,6 +115,53 @@ bool LTextEditKeyPress::eventFilter(QObject* watched, QEvent* event)
 	}
 	else
 		return QObject::eventFilter(watched, event);
+}
+
+void LSearchHighlighter::highlightBlock(const QString& text)
+{
+	int pos = this->currentBlock().position();
+	if (!_isHighlight)
+		return;
+	QTextCharFormat fmt3;
+	fmt3.setBackground(_selectBrush);
+
+	if (!_selectCursor.isNull())
+	{
+		this->setFormat(std::max(0, _selectCursor.selectionStart() - pos),
+			qMin(this->currentBlock().length(), _selectCursor.selectionEnd() - pos)
+			, fmt3);
+	}
+	QRegularExpressionMatchIterator i = _re.globalMatch(text);
+	while (i.hasNext())
+	{
+		QTextCharFormat fmt;
+		fmt.setBackground(_findGround);
+		QRegularExpressionMatch match = i.next();
+		int start = qMin(_selectCursor.selectionStart(), _selectCursor.selectionEnd());
+		int end = qMax(_selectCursor.selectionStart(), _selectCursor.selectionEnd());
+
+		if (!_nextCursor.isNull() && match.capturedStart() + pos == _nextCursor.selectionStart() && match.capturedEnd() + pos == _nextCursor.selectionEnd())
+			fmt.setForeground(_nextBrush);
+		else
+			fmt.setForeground(_searchBrush);
+		if (_selectCursor.isNull()
+			|| (match.capturedStart() + pos < start && match.capturedEnd() + pos < start)
+			|| (match.capturedStart() + pos > end && match.capturedEnd() + pos > end)
+			)
+			this->setFormat(match.capturedStart(), match.capturedLength(), fmt);
+		else
+		{
+			if (start > match.capturedStart() + pos)
+				this->setFormat(match.capturedStart(), start - match.capturedStart() - pos, fmt);
+			if (end < match.capturedEnd() + pos)
+				this->setFormat(end, match.capturedEnd() + pos - end, fmt);
+			fmt.setBackground(_selectBrush);
+			this->setFormat(qMax(match.capturedStart(), start - pos),
+				qMin(match.capturedEnd() + pos, end)
+				- qMax(match.capturedStart() + pos, start)
+				, fmt);
+		}
+	}
 }
 
 LTextEditToolWidget::LTextEditToolWidget(QFrame* parent)
@@ -297,21 +351,47 @@ void LTextEditToolWidget::keyReleaseEvent(QKeyEvent* event)
 {
 }
 
+void LTextEditToolWidget::showEvent(QShowEvent* event)
+{
+	QFrame::showEvent(event);
+	this->setFocus();
+	this->_searchLineEdit->setFocus();
+}
+
 LTextEdit::LTextEdit(QWidget* parent)
-	:QTextEdit(parent)
+	:QPlainTextEdit(parent)
 {
 	this->_searchToolWidget->hide();
 	auto filter = new LTextEditKeyPress(this);
 	this->installEventFilter(filter);
+	_lineNumberArea = new LLineNumberArea(this);
+	_lineNumberArea->hide();
+	updateLineNumberAreaWidth(0);
+
+	connect(this, &LTextEdit::blockCountChanged, this, &LTextEdit::updateLineNumberAreaWidth);
+	connect(this, &LTextEdit::updateRequest, this, &LTextEdit::updateLineNumberArea);
+	connect(this, &LTextEdit::cursorPositionChanged, this, &LTextEdit::highlightCurrentLine);
+
 	connect(this->_searchToolWidget, &LTextEditToolWidget::search, this, &LTextEdit::search);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::searchMove, this, &LTextEdit::searchMove);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::replace, this, &LTextEdit::replace);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::replaceAll, this, &LTextEdit::replaceAll);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::seeFindResult, this, &LTextEdit::showFindResult);
-	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	_highlighter->setSelectBrush(_colorInfo.rangeFindBrush);
 	_highlighter->setSearchBrush(_colorInfo.allFindBrush);
 	_highlighter->setNextBrush(_colorInfo.nextFindBrush);
+	_highlighter->setFindGround(_colorInfo.findGroundBrush);
+
+	QFontMetrics metrics(this->font());
+	double tabStopWidth = 4 * metrics.horizontalAdvance(' ');
+
+	QTextOption option = this->document()->defaultTextOption();
+	option.setTabStopDistance(tabStopWidth);
+	this->document()->setDefaultTextOption(option);
+	QFont font = this->font();
+	font.setPointSize(12);
+	this->setFont(font);
 }
 
 void LTextEdit::copySelectCursor(QTextCursor cursor)
@@ -381,7 +461,7 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	_findFlags = findFlags;
 	_lastCursor = QTextCursor();
 	_findData = text;
-	disconnect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->blockSignals(true);
 	this->setUpdatesEnabled(false);
 	QRegularExpression re(text);
@@ -404,14 +484,14 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	this->copySelectCursor(this->textCursor());
 	this->blockSignals(false);
 	this->setUpdatesEnabled(true);
-	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 }
 
 void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp)
 {
 	if (text.isEmpty())
 		return;
-	disconnect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	QTextCursor cursor = this->textCursor();
 	QTextDocument* document = this->document();
 	QTextCursor findCursor;
@@ -446,7 +526,7 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 		if ((pos < from || pos > to) || findCursor.isNull())
 		{
 			emit this->notFind();
-			connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+			connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 			return;
 		}
 	}
@@ -460,7 +540,7 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 		this->setTextCursor(findCursor);
 	}
 
-	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 }
 
 void LTextEdit::replace(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags, bool isRegExp)
@@ -527,12 +607,11 @@ void LTextEdit::replace(const QString& text, const QString& replaceText, QTextDo
 	}
 }
 
-void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags,
-	bool isRegExp)
+void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags, bool isRegExp)
 {
 	if (text.isEmpty())
 		return;
-	disconnect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->setUpdatesEnabled(false);
 	int from = 0;
 	int to;
@@ -614,7 +693,7 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 	findCursor.endEditBlock();
 
 	this->setUpdatesEnabled(true);
-	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	_highlighter->rehighlight();
 	this->update();
 	QMessageBox::information(this, "提示", QString("共替换了 %1 个").arg(count));
@@ -625,13 +704,13 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 	if (text.isEmpty())
 		return;
 	QList<FindItemInfo> list;
-	disconnect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	findFlags &= ~QTextDocument::FindBackward;
+	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->setUpdatesEnabled(false);
 	this->blockSignals(true);
 	int from = 0;
 	int to;
 	this->copySelectCursor(this->textCursor());
-	int count = 0;
 	if (!_selectCursor.isNull())
 	{
 		int a = _selectCursor.selectionStart();
@@ -639,6 +718,7 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 		from = a < b ? a : b;
 	}
 	QRegularExpression re(text);
+
 	QTextCursor findCursor(document());
 	// 将光标移动到from位置
 	findCursor.setPosition(from, QTextCursor::MoveAnchor);
@@ -690,14 +770,14 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 	QTextCursor cursor = this->textCursor();
 	cursor.clearSelection();
 	this->setTextCursor(cursor);
-	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
-	if (dialog)
+	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	if (_dialog)
 	{
-		delete dialog;
-		dialog = nullptr;
+		delete _dialog;
+		_dialog = nullptr;
 	}
-	dialog = new LFindItemDialog(this);
-	connect(dialog, &LFindItemDialog::findItem, this, &LTextEdit::findItemClicked);
+	_dialog = new LFindItemDialog(this);
+	connect(_dialog, &LFindItemDialog::findItem, this, &LTextEdit::findItemClicked);
 	QStringList keys = { "行号", "开始位置", "结束位置" , "内容" };
 	QList<QVariantMap> maps;
 	for (auto& item : list)
@@ -709,21 +789,137 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 		map.insert("结束位置", item.findEnd);
 		maps.append(map);
 	}
-	dialog->setItemInfos(keys, maps);
-	dialog->resize(600, 200);
-	dialog->show();
+	_dialog->setItemInfos(keys, maps);
+	_dialog->resize(600, 200);
+	_dialog->show();
+}
+
+void LTextEdit::lineNumberAreaPaintEvent(QPaintEvent* event)
+{
+	QPainter painter(_lineNumberArea);
+	painter.fillRect(event->rect(), Qt::lightGray);
+	QTextBlock block = firstVisibleBlock();
+	int blockNumber = block.blockNumber();
+	int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
+	int bottom = top + qRound(blockBoundingRect(block).height());
+	while (block.isValid() && top <= event->rect().bottom()) {
+		if (block.isVisible() && bottom >= event->rect().top()) {
+			QString number = QString::number(blockNumber + 1);
+			painter.setPen(Qt::black);
+			painter.drawText(0, top, _lineNumberArea->width(), fontMetrics().height(),
+				Qt::AlignRight, number);
+		}
+
+		block = block.next();
+		top = bottom;
+		bottom = top + qRound(blockBoundingRect(block).height());
+		++blockNumber;
+	}
+	update();
+}
+
+int LTextEdit::lineNumberAreaWidth() const
+{
+	int digits = 1;
+	int max = qMax(1, blockCount());
+	while (max >= 10) {
+		max /= 10;
+		++digits;
+	}
+
+	int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+
+	return space;
+}
+
+void LTextEdit::updateLineNumberAreaWidth(int newBlockCount)
+{
+	setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+}
+
+void LTextEdit::highlightCurrentLine()
+{
+	if (!isHighlightCurrentLine())
+		return;
+	QList<QTextEdit::ExtraSelection> extraSelections;
+
+	if (!isReadOnly()) {
+		QTextEdit::ExtraSelection selection;
+
+		QColor lineColor = QColor(Qt::gray).lighter(130);
+
+		selection.format.setBackground(lineColor);
+		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+		selection.cursor = textCursor();
+		selection.cursor.clearSelection();
+		extraSelections.append(selection);
+	}
+
+	setExtraSelections(extraSelections);
+}
+
+void LTextEdit::updateLineNumberArea(const QRect& rect, int dy)
+{
+	if (dy)
+		_lineNumberArea->scroll(0, dy);
+	else
+		_lineNumberArea->update(0, rect.y(), _lineNumberArea->width(), rect.height());
+
+	if (rect.contains(viewport()->rect()))
+		updateLineNumberAreaWidth(0);
+}
+
+void LTextEdit::selectLineByPoint(QPoint point)
+{
+	// 获取光标
+	QTextCursor cursor = cursorForPosition(point);
+	// 获取光标所在行的行号
+	//int line = cursor.blockNumber();
+	// 获取光标所在行的文本,根据换行符确定一行的开始和结束
+	QString lineText = cursor.block().text();
+	// 获取光标所在行的起始位置
+	int lineStart = cursor.block().position();
+	// 获取光标所在行的结束位置
+	int lineEnd = lineStart + lineText.length();
+	// 设置光标的位置
+	cursor.setPosition(lineStart);
+	cursor.setPosition(lineEnd, QTextCursor::KeepAnchor);
+	// 设置选中的文本
+	setTextCursor(cursor);
+}
+
+void LTextEdit::setLineNumberAreaVisible(bool visible) const
+{
+	if (visible)
+		this->_lineNumberArea->show();
+	else
+		this->_lineNumberArea->hide();
+}
+
+bool LTextEdit::isLineNumberAreaVisible() const
+{
+	return !_lineNumberArea->isHidden();
+}
+
+void LTextEdit::setHighlightCurrentLine(bool highlight)
+{
+	this->_isHighlightCurrentLine = highlight;
+}
+
+bool LTextEdit::isHighlightCurrentLine() const
+{
+	return _isHighlightCurrentLine;
 }
 
 void LTextEdit::keyPressEvent(QKeyEvent* event)
 {
-	QTextEdit::keyPressEvent(event);
+	QPlainTextEdit::keyPressEvent(event);
 	if (event->key() == Qt::Key_F && (event->modifiers() & Qt::ControlModifier))
 	{
 		if (this->_searchToolWidget->isHidden())
 		{
 			this->_searchToolWidget->init();
 			this->_searchToolWidget->show();
-			this->_searchToolWidget->setFocus();
 			QString text = _selectCursor.isNull() ? this->textCursor().selectedText() : _selectCursor.selectedText();
 			bool isLines = text.contains("\xE2\x80\xA9""");
 			if (!isLines)
@@ -739,6 +935,11 @@ void LTextEdit::keyPressEvent(QKeyEvent* event)
 			_highlighter->setIsHighlight(false);
 			_highlighter->rehighlight();
 			_selectCursor = QTextCursor();
+			if (_dialog)
+			{
+				delete _dialog;
+				_dialog = nullptr;
+			}
 		}
 		QRect rect = this->_searchToolWidget->rect();
 		int right = this->verticalScrollBar()->isHidden() ? 0 : this->verticalScrollBar()->width();
@@ -750,17 +951,19 @@ void LTextEdit::keyPressEvent(QKeyEvent* event)
 
 void LTextEdit::resizeEvent(QResizeEvent* event)
 {
-	QTextEdit::resizeEvent(event);
+	QPlainTextEdit::resizeEvent(event);
 	QRect rect = this->_searchToolWidget->rect();
 	int right = this->verticalScrollBar()->isHidden() ? 0 : this->verticalScrollBar()->width();
 	rect.moveTopRight(this->rect().topRight());
 	rect.moveRight(rect.right() - right - 1);
 	this->_searchToolWidget->setGeometry(rect);
+	QRect cr = contentsRect();
+	_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
 void LTextEdit::focusInEvent(QFocusEvent* event)
 {
-	QTextEdit::focusInEvent(event);
+	QPlainTextEdit::focusInEvent(event);
 	_selectCursor = QTextCursor();
 	_highlighter->setSelectCursor(_selectCursor);
 	this->search(_findData.toString(), _findFlags, _isRegExp);
@@ -768,7 +971,7 @@ void LTextEdit::focusInEvent(QFocusEvent* event)
 
 void LTextEdit::focusOutEvent(QFocusEvent* event)
 {
-	QTextEdit::focusOutEvent(event);
+	QPlainTextEdit::focusOutEvent(event);
 	_selectCursor = QTextCursor();
 	_highlighter->setSelectCursor(_selectCursor);
 	this->search(_findData.toString(), _findFlags, _isRegExp);
@@ -786,9 +989,10 @@ void LTextEdit::textChangedSlot()
 	}
 	_hashText = hashText;
 }
+
 void LTextEdit::paintEvent(QPaintEvent* event)
 {
-	QTextEdit::paintEvent(event);
+	QPlainTextEdit::paintEvent(event);
 }
 
 void LTextEdit::findItemClicked(FindItemInfo info)
@@ -801,10 +1005,19 @@ void LTextEdit::findItemClicked(FindItemInfo info)
 	_highlighter->rehighlight();
 	cursor.clearSelection();
 	this->setTextCursor(cursor);
-	// 让光标所在行滚动到可见区域的第一行。
+	/*
+	 *让光标所在行滚动到可见区域的第一行。
+	 *不知道为什么只写一遍是不可以的，
+	 *但是这里触发两次是正常的所以就这样吧。
+	*/
 	this->ensureCursorVisible();
 	QScrollBar* vScrollBar = this->verticalScrollBar();
 	int cursorY = this->cursorRect(cursor).top();
 	int scrollValue = vScrollBar->value() + cursorY - this->viewport()->rect().top();
+	vScrollBar->setValue(scrollValue);
+	this->ensureCursorVisible();
+	vScrollBar = this->verticalScrollBar();
+	cursorY = this->cursorRect(cursor).top();
+	scrollValue = vScrollBar->value() + cursorY - this->viewport()->rect().top();
 	vScrollBar->setValue(scrollValue);
 }

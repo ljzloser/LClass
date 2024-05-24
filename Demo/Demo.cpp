@@ -51,12 +51,14 @@ void Demo::doWork(QListWidgetItem* item)
 	{
 		LTextEdit* edit = new LTextEdit(this);
 		edit->setPlaceholderText("请输入内容");
-		edit->setText(R"({
+		edit->setPlainText(R"({
     name:asdasd,
     type:person,
     email:13123581@qq.com,
     type:person,
 })");
+		edit->setLineNumberAreaVisible(true);
+		//edit->setHighlightCurrentLine(true);
 		widget = edit;
 	}
 	if (widget)
