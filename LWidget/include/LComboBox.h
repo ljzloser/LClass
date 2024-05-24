@@ -94,4 +94,9 @@ namespace ljz
 		QCompleter* _completer;
 		void paintEvent(QPaintEvent* e) override;
 	};
+
+	class LWIDGET_EXPORT LWidgetComboBox :public QWidget
+	{
+	public:
+	};
 }

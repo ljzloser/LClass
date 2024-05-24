@@ -10,8 +10,50 @@
 #include  <QCryptographicHash>
 #include <QSyntaxHighlighter>
 #include <LCore>
+#include <QDialog>
+#include <QTableView>
+#include <QAbstractItemModel>
+#include <QTableWidget>
+#include <qstandarditemmodel.h>
+#include <QStyledItemDelegate>
 namespace ljz
 {
+	struct FindItemInfo
+	{
+		int lineNumber;
+		QString rowText;
+		int findBegin;
+		int findEnd;
+		FindItemInfo() = default;
+		FindItemInfo(const int  lineNumber, const QString& rowText, const int findBegin, const int findEnd)
+			:lineNumber(lineNumber), rowText(rowText), findBegin(findBegin), findEnd(findEnd)
+		{
+		}
+	};
+	class LFindItemDialog :public QDialog
+	{
+		Q_OBJECT
+	public:
+		explicit LFindItemDialog(QWidget* parent = nullptr);
+		~LFindItemDialog() override = default;
+		void setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps);
+	signals:
+		void findItem(FindItemInfo info);
+	private:
+		QTableView* _tableView = new QTableView(this);
+	};
+
+	class LFindItemDialogDelegate :public QStyledItemDelegate
+	{
+	public:
+		explicit LFindItemDialogDelegate(QWidget* parent = nullptr) :QStyledItemDelegate(parent) {}
+		~LFindItemDialogDelegate() override = default;
+
+	private:
+
+		void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	};
+
 	/**
 	 * 这里是为了处理回车等按键在textEdit 和 lineEdit 中同时触发的问题。
 	 */
@@ -137,6 +179,7 @@ namespace ljz
 		void searchMove(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 		void replace(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 		void replaceAll(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags, bool isRegExp = false);
+		void seeFindResult(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 	private:
 		QLineEdit* _searchLineEdit = new QLineEdit(this);
 		QPushButton* _searchButton = new QPushButton(this);
@@ -147,6 +190,7 @@ namespace ljz
 		void focusOutEvent(QFocusEvent* event) override;
 		QTextDocument::FindFlags createFlags() const;
 		QPushButton* _button = new QPushButton(this);
+		QPushButton* _seeButton = new QPushButton(this);
 		QPushButton* _replaceNextButton = new QPushButton("替换下一个");
 		QPushButton* _replaceAllButton = new QPushButton("全部替换");
 		QLineEdit* _replaceLineEdit = new QLineEdit();
@@ -174,6 +218,7 @@ namespace ljz
 		void replaceAll(const QString& text, const QString& replaceText, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 		LTextEditToolWidget* searchToolWidget() const { return _searchToolWidget; }
 		void setColorInfo(const ColorInfo& colorInfo) { _colorInfo = colorInfo; }
+		void showFindResult(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 	signals:
 		void notFind();
 	private:
@@ -192,5 +237,7 @@ namespace ljz
 		void textChangedSlot();
 		LSearchHighlighter* _highlighter = new LSearchHighlighter(this);
 		void paintEvent(QPaintEvent* event) override;
+		void findItemClicked(FindItemInfo info);
+		LFindItemDialog* dialog = nullptr;
 	};
 }

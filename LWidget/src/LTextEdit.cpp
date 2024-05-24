@@ -3,7 +3,88 @@
 #include <QTextDocumentFragment>
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QTableWidget>
+#include <QHeaderView>
 using namespace ljz;
+
+LFindItemDialog::LFindItemDialog(QWidget* parent)
+	:QDialog(parent)
+{
+	auto layout = new QVBoxLayout();
+	layout->addWidget(_tableView);
+	this->setLayout(layout);
+	this->setWindowIcon(QIcon(":/res/res/searchResult.png"));
+	this->setWindowTitle("搜索结果");
+	_tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	_tableView->horizontalHeader()->setStretchLastSection(true);
+	_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	// 整行选中
+	_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	_tableView->setItemDelegate(new LFindItemDialogDelegate(this));
+	connect(_tableView, &QTableView::doubleClicked, [=]()
+		{
+			FindItemInfo info;
+			int row = _tableView->currentIndex().row();
+			QVariantMap map = _tableView->model()->index(row, 3).data(Qt::UserRole + 1).value<QVariantMap>();
+			info.lineNumber = map.value("行号").toInt();
+			info.rowText = map.value("内容").toString();
+			info.findBegin = map.value("开始位置").toInt();
+			info.findEnd = map.value("结束位置").toInt();
+			emit this->findItem(info);
+		});
+}
+
+void LFindItemDialog::setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps)
+{
+	QStandardItemModel* model = new QStandardItemModel(_tableView);
+	model->setHorizontalHeaderLabels(keys);
+	for (const auto& map : maps)
+	{
+		QList<QStandardItem*> list;
+		for (const auto& key : keys)
+		{
+			auto item = new QStandardItem(map.value(key).toString());
+			if (key == "内容")
+				item->setData(map, Qt::UserRole + 1);
+			list.append(item);
+		}
+		model->appendRow(list);
+	}
+	_tableView->setModel(model);
+}
+
+void LFindItemDialogDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
+	const QModelIndex& index) const
+{
+	QVariant data = index.data(Qt::UserRole + 1);
+	// 判断data是否有值
+	if (!data.isNull())
+	{
+		QVariantMap map = data.value<QVariantMap>();
+		QString content = map.value("内容").toString();
+		if (!content.isEmpty())
+		{
+			int from = map.value("开始位置").toInt();
+			int to = map.value("结束位置").toInt();
+			QString left = content.left(from);
+			QString mid = content.mid(from, to - from);
+			QString right = content.right(content.length() - to);
+			QString highlightText = QString(R"(<span>%1</span><span style="background-color: yellow;">%2</span><span>%3</span>)")
+				.arg(LFunc::replaceSpaceToHtml(left))
+				.arg(LFunc::replaceSpaceToHtml(mid))
+				.arg(LFunc::replaceSpaceToHtml(right));
+			auto document = new QTextDocument();
+			document->setHtml(highlightText);
+			option.widget->style()->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
+			painter->save();
+			painter->translate(option.rect.topLeft());
+			document->drawContents(painter);
+			painter->restore();
+			return;
+		}
+	}
+	QStyledItemDelegate::paint(painter, option, index);
+}
 
 bool LTextEditKeyPress::eventFilter(QObject* watched, QEvent* event)
 {
@@ -87,10 +168,14 @@ LTextEditToolWidget::LTextEditToolWidget(QFrame* parent)
 	_button->setToolTip("在查找和替换模式之间切换");
 	_button->setCheckable(true);
 	_button->setIcon(QIcon(":/res/res/down.png"));
-
 	_button->setFixedSize(20, 20);
+	_seeButton->setIcon(QIcon(":/res/res/searchResult.png"));
+	//_seeButton->setIconSize(QSize(20, 20));
+	_seeButton->setToolTip("查看搜索结果");
+	_seeButton->setFixedSize(20, 20);
 	leftLayout->addWidget(_button);
 	leftLayout->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	leftLayout->addWidget(_seeButton);
 	mainLayout->addLayout(leftLayout);
 	mainLayout->addLayout(layout);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -122,7 +207,6 @@ LTextEditToolWidget::LTextEditToolWidget(QFrame* parent)
 				this->setFixedHeight(50);
 			}
 		});
-
 	connect(_searchLineEdit, &QLineEdit::textChanged, [=]()
 		{
 			emit this->search(_searchLineEdit->text(), createFlags(), _regExpButton->isChecked());
@@ -155,8 +239,10 @@ LTextEditToolWidget::LTextEditToolWidget(QFrame* parent)
 		{
 			emit this->replaceAll(_searchLineEdit->text(), _replaceLineEdit->text(), createFlags(), _regExpButton->isChecked());
 		});
-
-	// LTextEditToolWidget类 的背景色为黑色半透明
+	connect(this->_seeButton, &QPushButton::clicked, [=]()
+		{
+			emit seeFindResult(_searchLineEdit->text(), createFlags(), _regExpButton->isChecked());
+		});
 }
 
 void LTextEditToolWidget::setSearchText(const QString& text)
@@ -221,6 +307,7 @@ LTextEdit::LTextEdit(QWidget* parent)
 	connect(this->_searchToolWidget, &LTextEditToolWidget::searchMove, this, &LTextEdit::searchMove);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::replace, this, &LTextEdit::replace);
 	connect(this->_searchToolWidget, &LTextEditToolWidget::replaceAll, this, &LTextEdit::replaceAll);
+	connect(this->_searchToolWidget, &LTextEditToolWidget::seeFindResult, this, &LTextEdit::showFindResult);
 	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	_highlighter->setSelectBrush(_colorInfo.rangeFindBrush);
 	_highlighter->setSearchBrush(_colorInfo.allFindBrush);
@@ -462,7 +549,7 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 	QTextCursor findCursor(document());
 	// 将光标移动到from位置
 	findCursor.setPosition(from, QTextCursor::MoveAnchor);
-
+	int pos = -1;
 	findCursor.beginEditBlock(); // 将所有的替换操作合并在一起放入撤销栈中
 	do
 	{
@@ -480,8 +567,10 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 			tmpCursor = this->document()->find(text, findCursor, findFlags);
 		else
 			tmpCursor = this->document()->find(re, findCursor, findFlags);
-
-		int pos = tmpCursor.position();
+		if (pos == tmpCursor.position())
+			break;
+		else
+			pos = tmpCursor.position();
 
 		if ((pos < from || pos > to) || tmpCursor.isNull())
 		{
@@ -530,6 +619,100 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 	_highlighter->rehighlight();
 	this->update();
 	QMessageBox::information(this, "提示", QString("共替换了 %1 个").arg(count));
+}
+
+void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp)
+{
+	QList<FindItemInfo> list;
+	if (text.isEmpty())
+		return;
+	disconnect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	this->setUpdatesEnabled(false);
+	this->blockSignals(true);
+	int from = 0;
+	int to;
+	this->copySelectCursor(this->textCursor());
+	int count = 0;
+	if (!_selectCursor.isNull())
+	{
+		int a = _selectCursor.selectionStart();
+		int b = _selectCursor.selectionEnd();
+		from = a < b ? a : b;
+	}
+	QRegularExpression re(text);
+	QTextCursor findCursor(document());
+	// 将光标移动到from位置
+	findCursor.setPosition(from, QTextCursor::MoveAnchor);
+	int pos = -1;
+	do
+	{
+		from = 0;
+		to = this->document()->toPlainText().length();
+		if (!_selectCursor.isNull())
+		{
+			int a = _selectCursor.selectionStart();
+			int b = _selectCursor.selectionEnd();
+			from = a < b ? a : b;
+			to = a < b ? b : a;
+		}
+		QTextCursor tmpCursor;
+		if (!isRegExp)
+			tmpCursor = this->document()->find(text, findCursor, findFlags);
+		else
+			tmpCursor = this->document()->find(re, findCursor, findFlags);
+
+		if (pos == tmpCursor.position())
+			break;
+		else
+			pos = tmpCursor.position();
+		if ((pos < from || pos > to) || tmpCursor.isNull())
+		{
+			emit this->notFind();
+			break;
+		}
+		else
+		{
+			// 因为要合并到一起，所以findCursor不能通过 = 来赋值，而是通过 setPosition 来模拟移动光标
+			findCursor.setPosition(tmpCursor.selectionStart(), QTextCursor::MoveAnchor);
+			findCursor.setPosition(tmpCursor.selectionEnd(), QTextCursor::KeepAnchor);
+
+			QTextBlock block = findCursor.block();
+			FindItemInfo info;
+			info.lineNumber = block.blockNumber();
+			info.rowText = block.text();
+			info.findBegin = findCursor.selectionStart() - block.position();
+			info.findEnd = findCursor.selectionEnd() - block.position();
+			list.append(info);
+			this->setTextCursor(findCursor);
+		}
+	} while (!findCursor.isNull());
+	this->blockSignals(false);
+	this->setUpdatesEnabled(true);
+	QTextCursor cursor = this->textCursor();
+	cursor.clearSelection();
+	this->setTextCursor(cursor);
+	connect(this, &QTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
+	if (dialog)
+	{
+		delete dialog;
+		dialog = nullptr;
+	}
+	dialog = new LFindItemDialog(this);
+	connect(dialog, &LFindItemDialog::findItem, this, &LTextEdit::findItemClicked);
+	QStringList keys = { "行号", "开始位置", "结束位置" , "内容" };
+	QList<QVariantMap> maps;
+	for (auto& item : list)
+	{
+		QVariantMap map;
+		map.insert("行号", item.lineNumber);
+		map.insert("内容", item.rowText);
+		map.insert("开始位置", item.findBegin);
+		map.insert("结束位置", item.findEnd);
+		maps.append(map);
+	}
+	dialog->setItemInfos(keys, maps);
+	dialog->resize(600, 200);
+	dialog->show();
 }
 
 void LTextEdit::keyPressEvent(QKeyEvent* event)
@@ -607,4 +790,22 @@ void LTextEdit::textChangedSlot()
 void LTextEdit::paintEvent(QPaintEvent* event)
 {
 	QTextEdit::paintEvent(event);
+}
+
+void LTextEdit::findItemClicked(FindItemInfo info)
+{
+	QTextBlock block = this->document()->findBlockByLineNumber(info.lineNumber);
+	QTextCursor cursor = QTextCursor(block);
+	cursor.setPosition(block.position() + info.findBegin);
+	cursor.setPosition(block.position() + info.findEnd, QTextCursor::KeepAnchor);
+	_highlighter->setNextCursor(cursor);
+	_highlighter->rehighlight();
+	cursor.clearSelection();
+	this->setTextCursor(cursor);
+	// 让光标所在行滚动到可见区域的第一行。
+	this->ensureCursorVisible();
+	QScrollBar* vScrollBar = this->verticalScrollBar();
+	int cursorY = this->cursorRect(cursor).top();
+	int scrollValue = vScrollBar->value() + cursorY - this->viewport()->rect().top();
+	vScrollBar->setValue(scrollValue);
 }

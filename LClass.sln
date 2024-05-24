@@ -12,6 +12,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo", "Demo\Demo.vcxproj",
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LWidget", "LWidget\LWidget.vcxproj", "{2CFDC0D1-5848-4E5E-B2BA-211834089636}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73CD8F88-6465-4842-A93B-6455577871D0} = {73CD8F88-6465-4842-A93B-6455577871D0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
