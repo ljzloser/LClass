@@ -23,22 +23,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Demo.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
-    <QtUic Include="Demo.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtMoc Include="Demo.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="Demo.cpp">
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <QtUic Include="ui\Demo.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\Demo.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="resource\Demo.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
   </ItemGroup>
 </Project>

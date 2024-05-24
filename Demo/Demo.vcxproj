@@ -110,11 +110,17 @@ $(QtDllPath)/windeployqt $(TargetFileName)</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <QtRcc Include="Demo.qrc" />
-    <QtUic Include="Demo.ui" />
-    <QtMoc Include="Demo.h" />
-    <ClCompile Include="Demo.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Demo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="ui\Demo.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\Demo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="resource\Demo.qrc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

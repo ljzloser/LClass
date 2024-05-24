@@ -1,23 +1,23 @@
 ﻿#pragma once
 #include <QTextEdit>
 #include "lwidget_global.h"
-#include  <QLayout>
-#include  <QLineEdit>
-#include  <QComboBox>
-#include  <QPushButton>
-#include  "LButton.h"
-#include  <QLabel>
-#include  <QCryptographicHash>
+#include <QLayout>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QPushButton>
+#include "LButton.h"
+#include <QLabel>
+#include <QCryptographicHash>
 #include <QSyntaxHighlighter>
-#include <LCore>
 #include <QDialog>
-#include <QTableView>
-#include <QAbstractItemModel>
 #include <QTableWidget>
 #include <qstandarditemmodel.h>
 #include <QStyledItemDelegate>
+#include <QPlainTextEdit>
+
 namespace ljz
 {
+	class LLineNumberArea;
 	struct FindItemInfo
 	{
 		int lineNumber;
@@ -26,9 +26,7 @@ namespace ljz
 		int findEnd;
 		FindItemInfo() = default;
 		FindItemInfo(const int  lineNumber, const QString& rowText, const int findBegin, const int findEnd)
-			:lineNumber(lineNumber), rowText(rowText), findBegin(findBegin), findEnd(findEnd)
-		{
-		}
+			:lineNumber(lineNumber), rowText(rowText), findBegin(findBegin), findEnd(findEnd) {}
 	};
 	class LFindItemDialog :public QDialog
 	{
@@ -36,21 +34,21 @@ namespace ljz
 	public:
 		explicit LFindItemDialog(QWidget* parent = nullptr);
 		~LFindItemDialog() override = default;
-		void setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps);
+		void setItemInfos(const QStringList& keys, const QList<QVariantMap>& maps) const;
 	signals:
 		void findItem(FindItemInfo info);
 	private:
 		QTableView* _tableView = new QTableView(this);
+		QLabel* _label = new QLabel(this);
 	};
 
-	class LFindItemDialogDelegate :public QStyledItemDelegate
+	class LFindItemDialogDelegate final :public QStyledItemDelegate
 	{
 	public:
 		explicit LFindItemDialogDelegate(QWidget* parent = nullptr) :QStyledItemDelegate(parent) {}
 		~LFindItemDialogDelegate() override = default;
 
 	private:
-
 		void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	};
 
@@ -62,12 +60,14 @@ namespace ljz
 		Q_OBJECT
 	public:
 		explicit LTextEditKeyPress(QObject* parent = nullptr) :QObject(parent) {}
-		~LTextEditKeyPress() override {}
+		~LTextEditKeyPress() override = default;
+
 	protected:
 		bool eventFilter(QObject* watched, QEvent* event) override;
 	};
 
-	class NoNewlineValidator : public QValidator {
+	class NoNewlineValidator : public QValidator
+	{
 	public:
 		State validate(QString& input, int& pos) const override {
 			if (input.contains('\n') || input.contains('\r')) {
@@ -104,66 +104,26 @@ namespace ljz
 		{
 			_nextBrush = nextBrush;
 		}
+		void setFindGround(const QBrush& findGround)
+		{
+			_findGround = findGround;
+		}
 		void setIsHighlight(const bool isHighlight)
 		{
 			_isHighlight = isHighlight;
 		}
-
-		LSearchHighlighter(QWidget* parent = nullptr)
+		explicit LSearchHighlighter(QTextDocument* parent = nullptr)
 			:QSyntaxHighlighter(parent)
 		{
 		}
-		void highlightBlock(const QString& text) override
-		{
-			int pos = this->currentBlock().position();
-			if (!_isHighlight)
-				return;
-			QTextCharFormat fmt3;
-			fmt3.setBackground(_selectBrush);
-
-			if (!_selectCursor.isNull())
-			{
-				this->setFormat(std::max(0, _selectCursor.selectionStart() - pos),
-					qMin(this->currentBlock().length(), _selectCursor.selectionEnd() - pos)
-					, fmt3);
-			}
-			QRegularExpressionMatchIterator i = _re.globalMatch(text);
-			while (i.hasNext())
-			{
-				QTextCharFormat fmt;
-				QRegularExpressionMatch match = i.next();
-				int start = qMin(_selectCursor.selectionStart(), _selectCursor.selectionEnd());
-				int end = qMax(_selectCursor.selectionStart(), _selectCursor.selectionEnd());
-
-				if (!_nextCursor.isNull() && match.capturedStart() + pos == _nextCursor.selectionStart() && match.capturedEnd() + pos == _nextCursor.selectionEnd())
-					fmt.setForeground(_nextBrush);
-				else
-					fmt.setForeground(_searchBrush);
-				if (_selectCursor.isNull()
-					|| (match.capturedStart() + pos < start && match.capturedEnd() + pos < start)
-					|| (match.capturedStart() + pos > end && match.capturedEnd() + pos > end)
-					)
-					this->setFormat(match.capturedStart(), match.capturedLength(), fmt);
-				else
-				{
-					if (start > match.capturedStart() + pos)
-						this->setFormat(match.capturedStart(), start - match.capturedStart() - pos, fmt);
-					if (end < match.capturedEnd() + pos)
-						this->setFormat(end, match.capturedEnd() + pos - end, fmt);
-					fmt.setBackground(_selectBrush);
-					this->setFormat(qMax(match.capturedStart(), start - pos),
-						qMin(match.capturedEnd() + pos, end)
-						- qMax(match.capturedStart() + pos, start)
-						, fmt);
-				}
-			}
-		}
+		void highlightBlock(const QString& text) override;
 		QBrush _searchBrush;
 		QRegularExpression _re;
 		QTextCursor _selectCursor;
 		QBrush _selectBrush;
 		QTextCursor _nextCursor;
 		QBrush _nextBrush;
+		QBrush _findGround;
 		bool _isHighlight = false;
 	};
 	class LWIDGET_EXPORT LTextEditToolWidget final :public QFrame
@@ -187,26 +147,28 @@ namespace ljz
 		LSwitchButton* _caseSensitiveButton = new LSwitchButton(this);
 		LSwitchButton* _wholeWordButton = new LSwitchButton(this);
 		LSwitchButton* _regExpButton = new LSwitchButton(this);
-		void focusOutEvent(QFocusEvent* event) override;
-		QTextDocument::FindFlags createFlags() const;
 		QPushButton* _button = new QPushButton(this);
 		QPushButton* _seeButton = new QPushButton(this);
 		QPushButton* _replaceNextButton = new QPushButton("替换下一个");
 		QPushButton* _replaceAllButton = new QPushButton("全部替换");
 		QLineEdit* _replaceLineEdit = new QLineEdit();
+		QTextDocument::FindFlags createFlags() const;
+		void focusOutEvent(QFocusEvent* event) override;
 		void focusInEvent(QFocusEvent* event) override;
 		void keyReleaseEvent(QKeyEvent* event) override;
+		void showEvent(QShowEvent* event) override;
 	};
 
-	class LWIDGET_EXPORT LTextEdit final :public QTextEdit
+	class LWIDGET_EXPORT LTextEdit final :public QPlainTextEdit
 	{
 		Q_OBJECT
 	public:
 		struct ColorInfo
 		{
-			QBrush allFindBrush = QColor(191, 0, 255);
+			QBrush allFindBrush = QColor(Qt::darkGreen);
 			QBrush nextFindBrush = QColor(Qt::red);
 			QBrush rangeFindBrush = QColor(135, 206, 235);
+			QBrush findGroundBrush = QColor(Qt::yellow);
 			ColorInfo() = default;
 		};
 		explicit LTextEdit(QWidget* parent = nullptr);
@@ -221,23 +183,63 @@ namespace ljz
 		void showFindResult(const QString& text, QTextDocument::FindFlags findFlags, bool isRegExp = false);
 	signals:
 		void notFind();
+	public:
+		void lineNumberAreaPaintEvent(QPaintEvent* event);
+		int lineNumberAreaWidth() const;
+		void updateLineNumberAreaWidth(int newBlockCount);
+		void highlightCurrentLine();
+		void updateLineNumberArea(const QRect& rect, int dy);
+		void selectLineByPoint(QPoint point);
+		void setLineNumberAreaVisible(bool visible) const;
+		bool isLineNumberAreaVisible() const;
+		void setHighlightCurrentLine(bool highlight);
+		bool isHighlightCurrentLine() const;
 	private:
 		LTextEditToolWidget* _searchToolWidget{ new LTextEditToolWidget(this) };
-		void keyPressEvent(QKeyEvent* event) override;
-		void resizeEvent(QResizeEvent* event) override;
 		QTextCursor _selectCursor;
 		QVariant _findData = QVariant();
 		QTextDocument::FindFlags _findFlags;
 		bool _isRegExp = false;
 		QTextCursor _lastCursor;
-		void focusInEvent(QFocusEvent* event) override;
-		void focusOutEvent(QFocusEvent* event) override;
 		ColorInfo _colorInfo;
 		QString _hashText;
+		LSearchHighlighter* _highlighter = new LSearchHighlighter(this->document());
+		LFindItemDialog* _dialog = nullptr;
+		LLineNumberArea* _lineNumberArea = nullptr;
+		bool _isHighlightCurrentLine = false;
+		void keyPressEvent(QKeyEvent* event) override;
+		void resizeEvent(QResizeEvent* event) override;
+		void focusInEvent(QFocusEvent* event) override;
+		void focusOutEvent(QFocusEvent* event) override;
 		void textChangedSlot();
-		LSearchHighlighter* _highlighter = new LSearchHighlighter(this);
 		void paintEvent(QPaintEvent* event) override;
 		void findItemClicked(FindItemInfo info);
-		LFindItemDialog* dialog = nullptr;
+	};
+	class LWIDGET_EXPORT LLineNumberArea final : public QWidget
+	{
+	public:
+		LLineNumberArea(LTextEdit* editor) : QWidget(editor), codeEditor(editor) {}
+
+		QSize sizeHint() const override { return { codeEditor->lineNumberAreaWidth(), 0 }; }
+		// 重写鼠标点击事件
+		void mousePressEvent(QMouseEvent* event) override
+		{
+			//如果是左键
+			if (event->button() == Qt::LeftButton)
+			{
+				//获取鼠标点击的坐标
+				QPoint point = event->pos();
+				//根据坐标选中一行
+				codeEditor->selectLineByPoint(point);
+			}
+		}
+	protected:
+		void paintEvent(QPaintEvent* event) override
+		{
+			codeEditor->lineNumberAreaPaintEvent(event);
+		}
+
+	public:
+		LTextEdit* codeEditor;
 	};
 }

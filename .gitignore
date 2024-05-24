@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Demo/CMakeFiles
+/Demo/Demo_autogen
+/Demo/cmake_install.cmake
+/LCore/CMakeFiles
+/LCore/LCore_autogen
+/LCore/cmake_install.cmake
+/LWidget/CMakeFiles
+/LWidget/LWidget_autogen
+/LWidget/cmake_install.cmake

@@ -20,5 +20,6 @@ QString LFunc::escapeSpecialCharacters(const QString& text)
 
 QString LFunc::replaceSpaceToHtml(QString& text)
 {
-	return text.replace(" ", "&nbsp;");
+	QString result = text.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+	return result.replace(" ", "&nbsp;");
 }

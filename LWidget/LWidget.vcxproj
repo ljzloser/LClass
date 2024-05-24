@@ -29,7 +29,7 @@
     <ClCompile Include="src\LWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Resource.qrc" />
+    <QtRcc Include="resource\Resource.qrc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2CFDC0D1-5848-4E5E-B2BA-211834089636}</ProjectGuid>

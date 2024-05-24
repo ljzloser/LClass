@@ -71,7 +71,7 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Resource.qrc">
+    <QtRcc Include="resource\Resource.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
   </ItemGroup>
