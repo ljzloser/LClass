@@ -7,5 +7,6 @@ namespace ljz
 	{
 	public:
 		static QString escapeSpecialCharacters(const QString& text);
+		static QString replaceSpaceToHtml(QString& text);
 	};
 }
