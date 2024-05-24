@@ -14,7 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR}
         Widgets
 )
 qt_standard_project_setup()
-
+set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 FILE(GLOB_RECURSE RC_FILES ${PROJECT_SOURCE_DIR}/resource/*.rc)
