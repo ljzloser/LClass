@@ -10,6 +10,7 @@ Demo::Demo(QWidget* parent)
 	connect(ui.listWidget, &QListWidget::itemClicked, this, &Demo::doWork);
 	QStringList list = {
 		"LRingProgressBar(环形进度条)",
+		"LWaveProgressBar(海浪进度条)"
 	};
 	ui.listWidget->addItems(list);
 }
@@ -78,8 +79,8 @@ void Demo::doWork(QListWidgetItem* item)
 		LRingProgressBar* progress = new LRingProgressBar(this);
 		progress->setMinimum(0);
 		progress->setMaximum(100);
-		//progress->setFormat("%v/%m\n%p%");
-		/*
+		progress->setFormat("%v/%m\n%p%");
+
 		LRingProgressBar::ColorInfo info;
 		QConicalGradient gradient = QConicalGradient(0, 0, 0);
 		gradient.setColorAt(0.0, QColor(255, 0, 0));
@@ -87,14 +88,36 @@ void Demo::doWork(QListWidgetItem* item)
 		gradient.setColorAt(1.0, QColor(0, 255, 0));
 		info.bodyBrush = QBrush(gradient);
 		progress->setColorInfo(info);
-		*/
+
+		QTimer* timer = new QTimer(progress);
+		connect(timer, &QTimer::timeout, [progress]() {
+			progress->addValue();
+			});
+		connect(progress, &LRingProgressBar::valueChanged, [progress]() {
+			if (progress->value() == 100)
+			{
+				auto newProgress = LBaseProgressBar::clone<LWaveProgressBar>(progress);
+				newProgress->show();
+			}
+			});
+		timer->start(100);
+
+		//progress->setValue(80);
+		widget = progress;
+	}
+	else if (text.contains("LWaveProgressBar"))
+	{
+		LWaveProgressBar* progress = new LWaveProgressBar(this);
+		progress->setMinimum(0);
+		progress->setMaximum(100);
+		progress->setValue(80);
+		/*
 		QTimer* timer = new QTimer(progress);
 		connect(timer, &QTimer::timeout, [progress]() {
 			progress->addValue();
 			});
 		timer->start(100);
-
-		//progress->setValue(90);
+		*/
 		widget = progress;
 	}
 	if (widget)

@@ -80,6 +80,82 @@ void LBaseProgressBar::addValue(const int offset)
 	this->setValue(_value + offset);
 }
 
+QSize LCircularBaseProgressBar::sizeHint() const
+{
+	int size = std::min(this->rect().width(), this->rect().height());
+	size -= size / 5;
+	return{ size,size };
+}
+
+void LWaveProgressBar::paintEvent(QPaintEvent* event)
+{
+	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing);
+
+	int diameter = this->sizeHint().width(); // 圆的直径
+	int x = (width() - diameter) / 2;
+	int y = (height() - diameter) / 2;
+
+	QRect circleRect(x, y, diameter, diameter);
+
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(_colorInfo.waveBrush);
+	painter.drawEllipse(circleRect);
+
+	// 绘制波浪
+	painter.save();
+
+	QPainterPath wavePath;
+	wavePath.addEllipse(circleRect);
+	painter.setClipPath(wavePath);
+	int waveHeight = diameter * this->percent() / 100; // 根据进度计算波浪的高度
+	int waveLength = diameter / 2;
+	qreal amplitude = 10;
+
+	wavePath.moveTo(x, y + diameter - waveHeight);
+	for (int i = 0; i <= diameter; i++) {
+		qreal sineValue = amplitude * qSin(2 * M_PI * (i / static_cast<qreal>(waveLength)) + _wavePhase);
+		wavePath.lineTo(x + i, y + diameter - waveHeight + sineValue);
+	}
+	wavePath.lineTo(x + diameter, y + diameter);
+	wavePath.lineTo(x, y + diameter);
+	wavePath.setFillRule(Qt::OddEvenFill);
+	wavePath.closeSubpath();
+
+	painter.setBrush(_colorInfo.backGroundBrush);
+	painter.drawPath(wavePath);
+
+	painter.restore();
+	QFont font = this->font();
+	font.setPointSize(diameter / 10);
+	font.setBold(true);
+	painter.setPen(_colorInfo.foreground);
+	painter.setFont(font);
+	QFontMetrics fm(font);
+	QString text = this->text();
+	auto textRect = fm.boundingRect(this->rect(), Qt::TextWordWrap, text);
+	textRect.moveCenter(this->rect().center());
+	painter.drawText(textRect, Qt::AlignCenter, this->text());
+}
+
+void LWaveProgressBar::showEvent(QShowEvent* event)
+{
+	LBaseProgressBar::showEvent(event);
+	if (this->_waveAnimation->state() != QAbstractAnimation::Running)
+	{
+		this->_waveAnimation->setDuration(_animationDuration);
+		this->_waveAnimation->setStartValue(0);
+		this->_waveAnimation->setEndValue(2 * M_PI);
+		this->_waveAnimation->setLoopCount(-1);
+		this->_waveAnimation->start();
+	}
+}
+
+void LWaveProgressBar::hideEvent(QHideEvent* event)
+{
+	LBaseProgressBar::hideEvent(event);
+	this->_waveAnimation->stop();
+}
 void LRingProgressBar::getArcStartEnd(int size, QPointF& start, QPointF& end) const
 {
 	int x = -size; // 矩形左上角的 x 坐标
@@ -167,16 +243,9 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 	painter.setFont(font);
 	QFontMetrics fm(font);
 	QString text = this->text();
-	auto textRect = fm.boundingRect(QRect(), Qt::TextWordWrap, text);
+	auto textRect = fm.boundingRect(this->rect(), Qt::TextWordWrap, text);
 	textRect.moveCenter(this->rect().center());
 	painter.drawText(textRect, Qt::AlignCenter, this->text());
 
 	this->update();
-}
-
-QSize LRingProgressBar::sizeHint() const
-{
-	int size = std::min(this->rect().width(), this->rect().height());
-	size -= size / 5;
-	return{ size,size };
 }
