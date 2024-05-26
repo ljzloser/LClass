@@ -4,4 +4,5 @@
 #include "LInstrumentBoard.h"
 #include "LGraphicsEffect.h"
 #include "LTextEdit.h"
+#include "LProgressBar.h"
 using namespace ljz;

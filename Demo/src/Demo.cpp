@@ -1,6 +1,18 @@
 ﻿#include "../include/Demo.h"
 #include <QPushButton>
-
+#include <QTimer>
+#include <LWidget>
+#include <QLinearGradient>
+Demo::Demo(QWidget* parent)
+	: QMainWindow(parent)
+{
+	ui.setupUi(this);
+	connect(ui.listWidget, &QListWidget::itemClicked, this, &Demo::doWork);
+	QStringList list = {
+		"LRingProgressBar(环形进度条)",
+	};
+	ui.listWidget->addItems(list);
+}
 void Demo::doWork(QListWidgetItem* item)
 {
 	const auto text = item->text();
@@ -61,6 +73,30 @@ void Demo::doWork(QListWidgetItem* item)
 		//edit->setHighlightCurrentLine(true);
 		widget = edit;
 	}
+	else if (text.contains("LRingProgressBar"))
+	{
+		LRingProgressBar* progress = new LRingProgressBar(this);
+		progress->setMinimum(0);
+		progress->setMaximum(100);
+		//progress->setFormat("%v/%m\n%p%");
+		/*
+		LRingProgressBar::ColorInfo info;
+		QConicalGradient gradient = QConicalGradient(0, 0, 0);
+		gradient.setColorAt(0.0, QColor(255, 0, 0));
+		gradient.setColorAt(0.5, QColor(255, 255, 0));
+		gradient.setColorAt(1.0, QColor(0, 255, 0));
+		info.bodyBrush = QBrush(gradient);
+		progress->setColorInfo(info);
+		*/
+		QTimer* timer = new QTimer(progress);
+		connect(timer, &QTimer::timeout, [progress]() {
+			progress->addValue();
+			});
+		timer->start(100);
+
+		//progress->setValue(90);
+		widget = progress;
+	}
 	if (widget)
 	{
 		delete ui.widget;
@@ -71,13 +107,6 @@ void Demo::doWork(QListWidgetItem* item)
 		ui.gridLayout->addWidget(widget, 0, 1);
 		effect->inAnimationStart();
 	}
-}
-
-Demo::Demo(QWidget* parent)
-	: QMainWindow(parent)
-{
-	ui.setupUi(this);
-	connect(ui.listWidget, &QListWidget::itemClicked, this, &Demo::doWork);
 }
 
 Demo::~Demo()
