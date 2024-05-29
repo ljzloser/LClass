@@ -18,7 +18,7 @@
     <QtMoc Include="include\LTextEdit.h" />
     <QtMoc Include="include\LProgressBar.h" />
     <QtMoc Include="include\LLineedit.h" />
-    <ClInclude Include="include\LWidget.h" />
+    <QtMoc Include="include\LWidget.h" />
     <ClInclude Include="include\lwidget_global.h" />
   </ItemGroup>
   <ItemGroup>

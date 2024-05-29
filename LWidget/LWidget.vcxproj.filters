@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\LWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\lwidget_global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="include\LLineedit.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

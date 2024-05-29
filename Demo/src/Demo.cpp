@@ -14,6 +14,7 @@ Demo::Demo(QWidget* parent)
 		"LRingProgressBar(环形进度条)",
 		"LWaveProgressBar(海浪进度条)",
 		"LFileLineEdit(文件选择文本框)",
+		"LWidget(自定义窗口)",
 	};
 	ui.listWidget->addItems(list);
 }
@@ -122,6 +123,13 @@ void Demo::doWork(QListWidgetItem* item)
 			QMessageBox::information(edit, "选择文件", edit->selectedFiles("\n") + "\n" + filter + "\n" + QString::number(edit->info().mode));
 			});
 		widget = edit;
+	}
+	else if (text.contains("LWidget"))
+	{
+		LTitleBar* titleBar = new LTitleBar();
+		QWidget* mainWidget = new QWidget();
+		LWidget* _widget = new LWidget(titleBar, mainWidget);
+		_widget->show();
 	}
 	if (widget)
 	{
