@@ -13,7 +13,7 @@ namespace ljz
 	 * you need to implement the two pure virtual functions paintEvent and sizeHint\n
 	 * 你需要实现两个纯虚函数 paintEvent 和 sizeHint
 	 */
-    class LWIDGET_EXPORT LBaseProgressBar  : public QWidget
+	class LWIDGET_EXPORT LBaseProgressBar : public QWidget
 	{
 		Q_OBJECT
 			Q_PROPERTY(qint32 minimum READ minimum WRITE setMinimum)
@@ -164,11 +164,11 @@ namespace ljz
 		void setWavePhase(const qreal phase) { this->_wavePhase = phase; this->update(); }
 		[[nodiscard]] qreal wavePhase() const { return _wavePhase; }
 		/**
-		 * set the wave animation duration in millisecond default: 600
+		 * set the wave animation duration in millisecond default: 700
 		 * 设置波纹动画时长，单位毫秒
 		 * @param duration 0 to 2 * PI 从0到2*PI的时间间隔
 		 */
-		void setAnimationDuration(const int duration = 600) { _animationDuration = duration; }
+		void setAnimationDuration(const int duration = 700) { _animationDuration = duration; }
 		int animationDuration() const { return _animationDuration; }
 		void setColorInfo(const ColorInfo& colorInfo) { _colorInfo = colorInfo; }
 		ColorInfo colorInfo() const { return _colorInfo; }
@@ -178,7 +178,7 @@ namespace ljz
 		void hideEvent(QHideEvent* event) override;
 	private:
 		qreal _wavePhase{ 0 };
-		int _animationDuration{ 600 };
+		int _animationDuration{ 700 };
 		QPropertyAnimation* _waveAnimation{ new QPropertyAnimation(this, "wavePhase") };
 		ColorInfo _colorInfo;
 	};
@@ -223,6 +223,4 @@ namespace ljz
 		void paintEvent(QPaintEvent* event) override;
 		ColorInfo _colorInfo;
 	};
-
-
 }
