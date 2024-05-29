@@ -13,7 +13,7 @@ namespace ljz
 	 * you need to implement the two pure virtual functions paintEvent and sizeHint\n
 	 * 你需要实现两个纯虚函数 paintEvent 和 sizeHint
 	 */
-	class LWIDGET_EXPORT LBaseProgressBar : public QWidget
+    class LWIDGET_EXPORT LBaseProgressBar  : public QWidget
 	{
 		Q_OBJECT
 			Q_PROPERTY(qint32 minimum READ minimum WRITE setMinimum)
@@ -223,4 +223,6 @@ namespace ljz
 		void paintEvent(QPaintEvent* event) override;
 		ColorInfo _colorInfo;
 	};
+
+
 }

@@ -204,7 +204,7 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 	newRect.moveCenter(rect.center());
 	path.moveTo(0, -newRect.top());
 	path.arcTo(newRect, 0, 360);
-	painter.setPen(Qt::NoPen);
+    painter.setPen(Qt::NoPen);
 	painter.setBrush(_colorInfo.backGroundBrush);
 	painter.drawPath(path);
 
@@ -230,7 +230,7 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 			path.lineTo(newStart);
 			path.lineTo(start);
 			path.setFillRule(Qt::WindingFill);
-		}
+        }
 		painter.drawPath(path);
 	}
 

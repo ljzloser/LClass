@@ -3,14 +3,17 @@
 #include <QTimer>
 #include <LWidget>
 #include <QLinearGradient>
+#include <QMessageBox>
 Demo::Demo(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	this->setWindowIcon(QIcon(":/Demo/res/start.png"));
 	connect(ui.listWidget, &QListWidget::itemClicked, this, &Demo::doWork);
 	QStringList list = {
 		"LRingProgressBar(环形进度条)",
-		"LWaveProgressBar(海浪进度条)"
+		"LWaveProgressBar(海浪进度条)",
+		"LFileLineEdit(文件选择文本框)",
 	};
 	ui.listWidget->addItems(list);
 }
@@ -93,16 +96,7 @@ void Demo::doWork(QListWidgetItem* item)
 		connect(timer, &QTimer::timeout, [progress]() {
 			progress->addValue();
 			});
-		connect(progress, &LRingProgressBar::valueChanged, [progress]() {
-			if (progress->value() == 100)
-			{
-				auto newProgress = LBaseProgressBar::clone<LWaveProgressBar>(progress);
-				newProgress->show();
-			}
-			});
 		timer->start(100);
-
-		//progress->setValue(80);
 		widget = progress;
 	}
 	else if (text.contains("LWaveProgressBar"))
@@ -110,15 +104,24 @@ void Demo::doWork(QListWidgetItem* item)
 		LWaveProgressBar* progress = new LWaveProgressBar(this);
 		progress->setMinimum(0);
 		progress->setMaximum(100);
-		progress->setValue(80);
-		/*
 		QTimer* timer = new QTimer(progress);
 		connect(timer, &QTimer::timeout, [progress]() {
 			progress->addValue();
 			});
 		timer->start(100);
-		*/
 		widget = progress;
+	}
+	else if (text.contains("LFileLineEdit"))
+	{
+		LFileLineEdit* edit = new LFileLineEdit(this);
+		LFileLineEdit::Info info;
+		info.mode = QFileDialog::ExistingFiles;
+		info.filters = { "*.exe"," *.pdb" };
+		edit->setInfo(info);
+		connect(edit, &LFileLineEdit::fileSelected, [edit](const QStringList& list, const QString& filter) {
+			QMessageBox::information(edit, "选择文件", edit->selectedFiles("\n") + "\n" + filter + "\n" + QString::number(edit->info().mode));
+			});
+		widget = edit;
 	}
 	if (widget)
 	{

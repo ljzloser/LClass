@@ -17,6 +17,7 @@
     <QtMoc Include="include\LGraphicsEffect.h" />
     <QtMoc Include="include\LTextEdit.h" />
     <QtMoc Include="include\LProgressBar.h" />
+    <QtMoc Include="include\LLineedit.h" />
     <ClInclude Include="include\LWidget.h" />
     <ClInclude Include="include\lwidget_global.h" />
   </ItemGroup>
@@ -26,6 +27,7 @@
     <ClCompile Include="src\LComboBox.cpp" />
     <ClCompile Include="src\LGraphicsEffect.cpp" />
     <ClCompile Include="src\LInstrumentBoard.cpp" />
+    <ClCompile Include="src\LLineedit.cpp" />
     <ClCompile Include="src\LProgressBar.cpp" />
     <ClCompile Include="src\LTextEdit.cpp" />
     <ClCompile Include="src\LWidget.cpp" />
