@@ -1,9 +1,9 @@
-#include "LComboBox.h"
-#include "LWidget.h"
+﻿#include "LComboBox.h"
 #include "LButton.h"
 #include "LInstrumentBoard.h"
 #include "LGraphicsEffect.h"
 #include "LTextEdit.h"
 #include "LProgressBar.h"
 #include "LLineedit.h"
+#include "LJZWidget.h"
 using namespace ljz;

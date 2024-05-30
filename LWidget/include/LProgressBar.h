@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "lwidget_global.h"
-#include "QWidget"
+#include <QWidget>
 #include <QPropertyAnimation>
 #include <QTimer>
 namespace ljz

@@ -1,17 +1,15 @@
 ﻿#pragma once
-#include <QTextEdit>
 #include "lwidget_global.h"
+#include "LButton.h"
 #include <QLayout>
 #include <QLineEdit>
 #include <QComboBox>
-#include <QPushButton>
-#include "LButton.h"
 #include <QLabel>
 #include <QCryptographicHash>
 #include <QSyntaxHighlighter>
 #include <QDialog>
 #include <QTableWidget>
-#include <qstandarditemmodel.h>
+#include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QPlainTextEdit>
 

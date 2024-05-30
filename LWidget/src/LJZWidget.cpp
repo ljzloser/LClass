@@ -1,8 +1,9 @@
-﻿#include "LWidget.h"
+﻿#include "LJZWidget.h"
 #include <windowsx.h>
 using namespace ljz;
 
-LTitleBar::LTitleBar(QWidget* parent) : LBaseTitleBar(parent)
+LTitleBar::LTitleBar(QWidget* parent)
+	:LBaseTitleBar(parent)
 {
 	this->layout = new QHBoxLayout(this);
 	this->layout->setContentsMargins(0, 0, 0, 0);
@@ -19,8 +20,6 @@ LTitleBar::LTitleBar(QWidget* parent) : LBaseTitleBar(parent)
 	this->standardIconMap.insert(ButtonIcon::RestoreButtonIcon, style()->standardIcon(QStyle::SP_TitleBarNormalButton));
 	this->standardIconMap.insert(ButtonIcon::CloseButtonIcon, style()->standardIcon(QStyle::SP_TitleBarCloseButton));
 
-	this->setContextMenuPolicy(Qt::CustomContextMenu);//设置标题栏为自定义上下文菜单策略
-
 	this->minButton = new QPushButton(this);
 	this->minButton->setFixedSize(25, 25);
 	this->minButton->setIcon(this->standardIconMap.value(ButtonIcon::MinButtonIcon));
@@ -32,9 +31,6 @@ LTitleBar::LTitleBar(QWidget* parent) : LBaseTitleBar(parent)
 	this->maxButton->setFixedSize(25, 25);
 	this->maxButton->setIcon(this->standardIconMap.value(ButtonIcon::MaxButtonIcon));
 	this->maxButton->setCursor(Qt::PointingHandCursor);
-	//connect(this->maxButton, &QPushButton::clicked, this, &QCustomTitleBar::updateIcon); //最大化按钮信号,切换图标
-	//connect(this->maxButton, &QPushButton::clicked, this, &LTitleBar::maxButtonClicked);
-	//设置悬停提示
 	this->maxButton->setToolTip("最大化/还原");
 	this->maxButton->setObjectName("maxButton");
 
@@ -55,15 +51,6 @@ LTitleBar::LTitleBar(QWidget* parent) : LBaseTitleBar(parent)
 	this->setTitleText("Title");
 	this->icon = style()->standardIcon(QStyle::SP_TitleBarMenuButton);
 	this->flag = false;
-}
-
-LTitleBar::~LTitleBar()
-{
-	delete this->layout;
-
-	delete this->minButton;
-	delete this->maxButton;
-	delete this->closeButton;
 }
 
 void LTitleBar::setTitleIcon(const QIcon& icon)

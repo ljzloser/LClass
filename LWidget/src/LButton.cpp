@@ -2,6 +2,56 @@
 #include <QPainterPath>
 using namespace ljz;
 
+LPixmapButton::LPixmapButton(QWidget* parent)
+	:QPushButton(parent)
+{
+}
+
+void LPixmapButton::setPixmap(const QPixmap& pixmap)
+{
+	this->_pixmap = pixmap;
+	this->_drawPixmap = pixmap;
+	QBitmap mask = _drawPixmap.createMaskFromColor(Qt::transparent);
+	this->setFixedSize(_drawPixmap.size());
+	this->setMask(mask);
+}
+
+QPixmap LPixmapButton::pixmap() const
+{
+	return this->_pixmap;
+}
+
+void LPixmapButton::paintEvent(QPaintEvent* event)
+{
+	Q_UNUSED(event);
+	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.drawPixmap(0, 0, this->_drawPixmap);
+}
+
+void LPixmapButton::mousePressEvent(QMouseEvent* event)
+{
+	if (!this->mask().contains(event->pos()))
+		event->ignore();
+	else
+		QPushButton::mousePressEvent(event);
+}
+
+void LPixmapButton::enterEvent(QEnterEvent* event)
+{
+	QPushButton::enterEvent(event);
+	this->_drawPixmap = pixmap().scaled(pixmap().size() * 1.05, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QBitmap mask = _drawPixmap.createMaskFromColor(Qt::transparent);
+	this->setFixedSize(_drawPixmap.size());
+	this->setMask(mask);
+}
+
+void LPixmapButton::leaveEvent(QEvent* event)
+{
+	QPushButton::leaveEvent(event);
+	this->setPixmap(this->pixmap());
+}
+
 void LSwitchButton::StateInfo::reSize(double radius)
 {
 	if (this->buttonPixmap.isNull())

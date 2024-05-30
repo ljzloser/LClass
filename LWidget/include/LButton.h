@@ -1,14 +1,30 @@
 ﻿#pragma once
 #include "lwidget_global.h"
-#include "QAbstractButton"
+#include <QAbstractButton>
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QResizeEvent>
 #include <QEvent>
 #include <QObject>
-
+#include <QPushButton>
 namespace ljz
 {
+	class LWIDGET_EXPORT LPixmapButton : public QPushButton
+	{
+		Q_OBJECT
+	public:
+		explicit LPixmapButton(QWidget* parent = nullptr);
+		~LPixmapButton() override = default;
+		void setPixmap(const QPixmap& pixmap);
+		QPixmap pixmap() const;
+	protected:
+		void paintEvent(QPaintEvent* event) override;
+		void mousePressEvent(QMouseEvent* event) override;
+		void enterEvent(QEnterEvent* event) override;
+		void leaveEvent(QEvent* event) override;
+		QPixmap _pixmap;
+		QPixmap _drawPixmap;
+	};
 	/**
 	 * 开关按钮控件
 	 */

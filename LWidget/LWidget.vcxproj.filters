@@ -31,9 +31,6 @@
     <ClCompile Include="src\LComboBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\LWidget">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -53,6 +50,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LLineedit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LJZWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,7 +78,7 @@
     <QtMoc Include="include\LLineedit.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="include\LWidget.h">
+    <QtMoc Include="include\LJZWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

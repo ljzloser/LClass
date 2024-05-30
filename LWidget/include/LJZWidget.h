@@ -1,10 +1,19 @@
 ﻿#pragma once
 
 #include "lwidget_global.h"
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPainter>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QStyle>
 #include <QWidget>
-#include <LWidget>
-#include "windows.h"
+#include <QEvent>
+#include <QSpacerItem>
+#include <Windows.h>
 #pragma comment (lib,"user32.lib")
+
 namespace ljz
 {
 	class LWIDGET_EXPORT LBaseTitleBar : public QWidget
@@ -23,6 +32,7 @@ namespace ljz
 		virtual void closeButtonClick() = 0;
 		virtual void minButtonClick() = 0;
 	};
+
 	class LWIDGET_EXPORT LTitleBar : public LBaseTitleBar
 	{
 		Q_OBJECT
@@ -36,7 +46,7 @@ namespace ljz
 			CloseButtonIcon//关闭按钮图标
 		};
 		explicit LTitleBar(QWidget* parent = nullptr);
-		~LTitleBar() override;
+		~LTitleBar() override = default;
 		//设置标题栏图标
 		void setTitleIcon(const QIcon& icon);
 		void setTitleIcon(const QPixmap& pixmap);
@@ -78,7 +88,6 @@ namespace ljz
 		bool flag; //最大化按钮标志
 		QMap<ButtonIcon, QIcon> standardIconMap; //标准按钮图标
 	};
-
 	class LWIDGET_EXPORT LWidget : public QWidget
 	{
 		Q_OBJECT

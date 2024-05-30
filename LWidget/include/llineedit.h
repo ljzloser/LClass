@@ -1,8 +1,8 @@
 ﻿#ifndef LLINEEDIT_H
 #define LLINEEDIT_H
 
-#include <QLineEdit>
 #include "lwidget_global.h"
+#include <QLineEdit>
 #include <QApplication>
 #include <QFileDialog>
 namespace ljz {
