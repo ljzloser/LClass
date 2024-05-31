@@ -13,7 +13,9 @@ Demo::Demo(QWidget* parent)
 		"LRingProgressBar(环形进度条)",
 		"LWaveProgressBar(海浪进度条)",
 		"LFileLineEdit(文件选择文本框)",
+#ifdef WIN32
 		"LWidget(自定义窗口)",
+#endif
 		"LPixmapButton(图片按钮)"
 	};
 	ui.listWidget->addItems(list);
@@ -25,7 +27,7 @@ void Demo::doWork(QListWidgetItem* item)
 	if (text.contains("LMultiComboBox"))
 	{
 		LMultiComboBox* combo = new LMultiComboBox(this);
-		combo->addItems({ "APPLE", "apple", "3" });
+        combo->addItems({ "APPLE", "apple", "3" });
 		widget = combo;
 	}
 	else if (text.contains("LCompleteComboBox"))
@@ -124,6 +126,7 @@ void Demo::doWork(QListWidgetItem* item)
 			});
 		widget = edit;
 	}
+#ifdef WIN32
 	else if (text.contains("LWidget"))
 	{
 		LTitleBar* titleBar = new LTitleBar();
@@ -131,6 +134,7 @@ void Demo::doWork(QListWidgetItem* item)
 		LWidget* _widget = new LWidget(titleBar, mainWidget);
 		_widget->show();
 	}
+#endif
 	else if (text.contains("LPixmapButton"))
 	{
 		LPixmapButton* pixmapButton = new LPixmapButton();

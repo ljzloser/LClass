@@ -1,5 +1,8 @@
 ﻿#include "LJZWidget.h"
+#ifdef WIN32
 #include <windowsx.h>
+#endif // WIN32
+
 using namespace ljz;
 
 LTitleBar::LTitleBar(QWidget* parent)
@@ -316,6 +319,7 @@ bool LWidget::nativeEvent(const QByteArray& eventType, void* message, qintptr* r
 bool LWidget::nativeEvent(const QByteArray& eventType, void* message, long* result)
 #endif
 {
+    #ifdef WIN32
 	if (eventType == "windows_generic_MSG")
 	{
 		MSG* msg = static_cast<MSG*>(message);//转换类型
@@ -467,6 +471,7 @@ bool LWidget::nativeEvent(const QByteArray& eventType, void* message, long* resu
 		}
 	}
 	return false;
+    #endif
 }
 
 bool LWidget::eventFilter(QObject* obj, QEvent* event)

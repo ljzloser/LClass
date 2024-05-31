@@ -5,5 +5,7 @@
 #include "LTextEdit.h"
 #include "LProgressBar.h"
 #include "LLineedit.h"
+#ifdef WIN32
 #include "LJZWidget.h"
+#endif
 using namespace ljz;

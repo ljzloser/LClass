@@ -461,10 +461,12 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	_findFlags = findFlags;
 	_lastCursor = QTextCursor();
 	_findData = text;
+    QRegularExpression re(text);
+    if(!re.isValid() && isRegExp)
+        re = QRegularExpression();
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->blockSignals(true);
 	this->setUpdatesEnabled(false);
-	QRegularExpression re(text);
 
 	if (!isRegExp)
 	{
@@ -480,10 +482,10 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	{
 		re.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 	}
-	_highlighter->setRe(re);
-	this->copySelectCursor(this->textCursor());
-	this->blockSignals(false);
-	this->setUpdatesEnabled(true);
+    _highlighter->setRe(re);
+    this->copySelectCursor(this->textCursor());
+    this->blockSignals(false);
+    this->setUpdatesEnabled(true);
 	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 }
 
@@ -491,6 +493,9 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 {
 	if (text.isEmpty())
 		return;
+    QRegularExpression re(text);
+    if(!re.isValid() && isRegExp)
+        return;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	QTextCursor cursor = this->textCursor();
 	QTextDocument* document = this->document();
@@ -505,12 +510,9 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 			findCursor = document->find(text, findCursor, findFlags);
 		else
 		{
-			QRegularExpression re(text);
 			// 是否区分大小写
 			if (!(findFlags & QTextDocument::FindCaseSensitively))
-			{
 				re.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-			}
 			findCursor = document->find(re, findCursor, findFlags);
 		}
 	}
@@ -536,10 +538,7 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 
 	findCursor.clearSelection();
 	if (!findCursor.isNull())
-	{
 		this->setTextCursor(findCursor);
-	}
-
 	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 }
 
@@ -547,16 +546,21 @@ void LTextEdit::replace(const QString& text, const QString& replaceText, QTextDo
 {
 	if (text.isEmpty())
 		return;
+    QRegularExpression re(text);
+    if(!re.isValid() && isRegExp)
+        return;
 	QTextCursor cursor = this->textCursor();
 	QTextDocument* document = this->document();
 	QTextCursor findCursor;
 
-	QRegularExpression re(text);
 
 	if (!isRegExp)
 		findCursor = document->find(text, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
 	else
-		findCursor = document->find(re, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
+    {
+        findCursor = document->find(re, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
+    }
+
 
 	this->copySelectCursor(this->textCursor());
 	if (!_selectCursor.isNull())
@@ -611,6 +615,9 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 {
 	if (text.isEmpty())
 		return;
+    QRegularExpression re(text);
+    if (isRegExp && !re.isValid())
+        return;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->setUpdatesEnabled(false);
 	int from = 0;
@@ -623,7 +630,6 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 		int b = _selectCursor.selectionEnd();
 		from = a < b ? a : b;
 	}
-	QRegularExpression re(text);
 	QTextCursor findCursor(document());
 	// 将光标移动到from位置
 	findCursor.setPosition(from, QTextCursor::MoveAnchor);
@@ -703,6 +709,9 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 {
 	if (text.isEmpty())
 		return;
+    QRegularExpression re(text);
+    if (isRegExp && !re.isValid())
+        return;
 	QList<FindItemInfo> list;
 	findFlags &= ~QTextDocument::FindBackward;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
@@ -717,8 +726,6 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 		int b = _selectCursor.selectionEnd();
 		from = a < b ? a : b;
 	}
-	QRegularExpression re(text);
-
 	QTextCursor findCursor(document());
 	// 将光标移动到from位置
 	findCursor.setPosition(from, QTextCursor::MoveAnchor);

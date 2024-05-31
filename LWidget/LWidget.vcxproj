@@ -19,6 +19,7 @@
     <QtMoc Include="include\LProgressBar.h" />
     <QtMoc Include="include\LLineedit.h" />
     <QtMoc Include="include\LJZWidget.h" />
+    <QtMoc Include="include\LNavigationBar.h" />
     <ClInclude Include="include\lwidget_global.h" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +29,7 @@
     <ClCompile Include="src\LGraphicsEffect.cpp" />
     <ClCompile Include="src\LInstrumentBoard.cpp" />
     <ClCompile Include="src\LLineedit.cpp" />
+    <ClCompile Include="src\LNavigationBar.cpp" />
     <ClCompile Include="src\LProgressBar.cpp" />
     <ClCompile Include="src\LTextEdit.cpp" />
     <ClCompile Include="src\LJZWidget.cpp" />
@@ -61,12 +63,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.6.1_msvc2019_64</QtInstall>
+    <QtInstall>6.6.3_msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.6.1_msvc2019_64</QtInstall>
+    <QtInstall>6.6.3_msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
