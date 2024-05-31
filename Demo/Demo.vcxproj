@@ -60,10 +60,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>

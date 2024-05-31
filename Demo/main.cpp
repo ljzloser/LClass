@@ -1,4 +1,4 @@
-#include "include/Demo.h"
+#include "Demo.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char* argv[])

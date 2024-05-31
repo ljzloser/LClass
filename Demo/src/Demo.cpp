@@ -1,5 +1,4 @@
-﻿#include "../include/Demo.h"
-#include <QPushButton>
+﻿#include "Demo.h"
 #include <QTimer>
 #include <LWidget>
 #include <QLinearGradient>
