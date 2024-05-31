@@ -14,7 +14,7 @@ Demo::Demo(QWidget* parent)
 		"LRingProgressBar(环形进度条)",
 		"LWaveProgressBar(海浪进度条)",
 		"LFileLineEdit(文件选择文本框)",
-		"LJZWidget(自定义窗口)",
+		"LWidget(自定义窗口)",
 		"LPixmapButton(图片按钮)"
 	};
 	ui.listWidget->addItems(list);
@@ -125,7 +125,7 @@ void Demo::doWork(QListWidgetItem* item)
 			});
 		widget = edit;
 	}
-	else if (text.contains("LJZWidget"))
+	else if (text.contains("LWidget"))
 	{
 		LTitleBar* titleBar = new LTitleBar();
 		QWidget* mainWidget = new QWidget();
