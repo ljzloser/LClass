@@ -879,9 +879,7 @@ void LTextEdit::updateLineNumberArea(const QRect& rect, int dy)
 void LTextEdit::selectLineByPoint(QPoint point)
 {
 	// 获取光标
-	QTextCursor cursor = cursorForPosition(point);
-	// 获取光标所在行的行号
-	//int line = cursor.blockNumber();
+    QTextCursor cursor = cursorForPosition(point);
 	// 获取光标所在行的文本,根据换行符确定一行的开始和结束
 	QString lineText = cursor.block().text();
 	// 获取光标所在行的起始位置
