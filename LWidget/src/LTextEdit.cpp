@@ -461,9 +461,9 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	_findFlags = findFlags;
 	_lastCursor = QTextCursor();
 	_findData = text;
-    QRegularExpression re(text);
-    if(!re.isValid() && isRegExp)
-        re = QRegularExpression();
+	QRegularExpression re(text);
+	if (!re.isValid() && isRegExp)
+		re = QRegularExpression();
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->blockSignals(true);
 	this->setUpdatesEnabled(false);
@@ -482,10 +482,10 @@ void LTextEdit::search(const QString& text, QTextDocument::FindFlags findFlags, 
 	{
 		re.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 	}
-    _highlighter->setRe(re);
-    this->copySelectCursor(this->textCursor());
-    this->blockSignals(false);
-    this->setUpdatesEnabled(true);
+	_highlighter->setRe(re);
+	this->copySelectCursor(this->textCursor());
+	this->blockSignals(false);
+	this->setUpdatesEnabled(true);
 	connect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 }
 
@@ -493,9 +493,9 @@ void LTextEdit::searchMove(const QString& text, QTextDocument::FindFlags findFla
 {
 	if (text.isEmpty())
 		return;
-    QRegularExpression re(text);
-    if(!re.isValid() && isRegExp)
-        return;
+	QRegularExpression re(text);
+	if (!re.isValid() && isRegExp)
+		return;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	QTextCursor cursor = this->textCursor();
 	QTextDocument* document = this->document();
@@ -546,21 +546,19 @@ void LTextEdit::replace(const QString& text, const QString& replaceText, QTextDo
 {
 	if (text.isEmpty())
 		return;
-    QRegularExpression re(text);
-    if(!re.isValid() && isRegExp)
-        return;
+	QRegularExpression re(text);
+	if (!re.isValid() && isRegExp)
+		return;
 	QTextCursor cursor = this->textCursor();
 	QTextDocument* document = this->document();
 	QTextCursor findCursor;
 
-
 	if (!isRegExp)
 		findCursor = document->find(text, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
 	else
-    {
-        findCursor = document->find(re, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
-    }
-
+	{
+		findCursor = document->find(re, _lastCursor.isNull() ? cursor : _lastCursor, findFlags);
+	}
 
 	this->copySelectCursor(this->textCursor());
 	if (!_selectCursor.isNull())
@@ -615,9 +613,9 @@ void LTextEdit::replaceAll(const QString& text, const QString& replaceText, QTex
 {
 	if (text.isEmpty())
 		return;
-    QRegularExpression re(text);
-    if (isRegExp && !re.isValid())
-        return;
+	QRegularExpression re(text);
+	if (isRegExp && !re.isValid())
+		return;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
 	this->setUpdatesEnabled(false);
 	int from = 0;
@@ -709,9 +707,9 @@ void LTextEdit::showFindResult(const QString& text, QTextDocument::FindFlags fin
 {
 	if (text.isEmpty())
 		return;
-    QRegularExpression re(text);
-    if (isRegExp && !re.isValid())
-        return;
+	QRegularExpression re(text);
+	if (isRegExp && !re.isValid())
+		return;
 	QList<FindItemInfo> list;
 	findFlags &= ~QTextDocument::FindBackward;
 	disconnect(this, &QPlainTextEdit::textChanged, this, &LTextEdit::textChangedSlot);
@@ -879,7 +877,7 @@ void LTextEdit::updateLineNumberArea(const QRect& rect, int dy)
 void LTextEdit::selectLineByPoint(QPoint point)
 {
 	// 获取光标
-    QTextCursor cursor = cursorForPosition(point);
+	QTextCursor cursor = cursorForPosition(point);
 	// 获取光标所在行的文本,根据换行符确定一行的开始和结束
 	QString lineText = cursor.block().text();
 	// 获取光标所在行的起始位置
