@@ -2,14 +2,11 @@ from typing import Any, overload
 
 from PySide6.QtCore import QObject, QEvent, Signal, Slot, Qt, QRect
 from PySide6.QtGui import QStandardItemModel, QMouseEvent, QKeyEvent, QStandardItem, QCursor
-from PySide6.QtWidgets import QComboBox, QListView, QLineEdit, QWidget
+from PySide6.QtWidgets import QComboBox, QListView, QLineEdit, QWidget, QCompleter
 
 
 class KeyPressEater(QObject):
     activated = Signal(int)
-
-    def __init__(self, parent: QObject = None):
-        super().__init__(parent)
 
     def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.Type.KeyPress:
@@ -33,41 +30,30 @@ class LMultiComboBox(QComboBox):
     itemStateChanged = Signal()
 
     class ItemInfo:
-        def __init__(self, index: int = -1, text: str = "", data: Any = None, isCheck: bool = False):
-            self.isCheck = isCheck
-            self.data = data
-            self.text = text
+        def __init__(self, index=-1, text="", data=None, isCheck=False):
             self.index = index
+            self.text = text
+            self.data = data
+            self.isCheck = isCheck
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        self._lineEdit = QLineEdit()
-        self._listView = QListView()
-        self._model = QStandardItemModel()
-        self._lineEdit.setReadOnly(True)
+        self._model = QStandardItemModel(self)
+        self._lineEdit = QLineEdit(self)
+        self._listView = QListView(self)
+        self.setModel(self._model)
         self.setLineEdit(self._lineEdit)
-        keyPressEater = KeyPressEater(self)
-        self._listView.installEventFilter(keyPressEater)
         self.setView(self._listView)
-        self._listView.setModel(self._model)
+        self._keyPressEater = KeyPressEater(self)
+        self._listView.installEventFilter(self._keyPressEater)
         self.activated.connect(self.selectActivated)
-        keyPressEater.activated.connect(self.selectActivated)
-
-    def updateText(self):
-        strList = []
-        for i in range(self._model.rowCount()):
-            item = self._model.item(i)
-            if item.checkState() == Qt.CheckState.Checked:
-                strList.append(item.text())
-        self._lineEdit.setText(",".join(strList))
-        self._lineEdit.setToolTip("\n".join(strList))
+        self._keyPressEater.activated.connect(self.selectActivated)
 
     def addItem(self, text: str, isCheck: bool = False, data: Any = None):
         item = QStandardItem(text)
         item.setCheckable(True)
-        item.setCheckState(Qt.CheckState.Checked if isCheck
-                           else Qt.CheckState.Unchecked)
-        item.setData(str, role=Qt.ItemDataRole.UserRole + 1)
+        item.setCheckState(Qt.CheckState.Checked if isCheck else Qt.CheckState.Unchecked)
+        item.setData(data)
         self._model.appendRow(item)
         self.updateText()
 
@@ -83,21 +69,18 @@ class LMultiComboBox(QComboBox):
     def addItems(self, items: list[str]):
         pass
 
-    def addItems(self, *args, **kwargs):
-        if len(args) == 1:
-            if isinstance(args[0], list):
-                for item in args[0]:
-                    if isinstance(item, self.ItemInfo):
-                        self.addItem(item.text, item.isCheck, item.data)
-                    else:
-                        self.addItem(item)
-            elif isinstance(args[0], dict):
-                for key, value in args[0].items():
-                    self.addItem(key, value)
-            else:
-                raise ValueError("Unsupported type")
+    def addItems(self, items):
+        if isinstance(items, (list, tuple)):
+            for item in items:
+                if isinstance(item, self.ItemInfo):
+                    self.addItem(item.text, item.isCheck, item.data)
+                elif isinstance(item, str):
+                    self.addItem(item)
+        elif isinstance(items, dict):
+            for text, isCheck in items.items():
+                self.addItem(text, isCheck)
 
-    def removeItem(self, index):
+    def removeItem(self, index: int):
         self._model.removeRow(index)
         self.updateText()
 
@@ -106,37 +89,24 @@ class LMultiComboBox(QComboBox):
         self.updateText()
 
     def selectedItemsText(self) -> list[str]:
-        return self._lineEdit.text().split(",")
+        return [self._model.item(i).text() for i in range(self._model.rowCount()) if
+                self._model.item(i).checkState() == Qt.CheckState.Checked]
 
     def selectedItems(self) -> list[ItemInfo]:
-        items = []
-        for i in range(self._model.rowCount()):
-            item = self._model.item(i)
-            if item.checkState() == Qt.CheckState.Checked:
-                itemInfo = self.ItemInfo(i, item.text(), item.data(Qt.ItemDataRole.UserRole + 1), True)
-                items.append(itemInfo)
-        return items
+        return [self.ItemInfo(i, self._model.item(i).text(), self._model.item(i).data(),
+                              self._model.item(i).checkState() == Qt.CheckState.Checked) for i in
+                range(self._model.rowCount()) if self._model.item(i).checkState() == Qt.CheckState.Checked]
 
-    def itemText(self, index: int) -> str:
-        if 0 <= index < self._model.rowCount():
-            return self._model.item(index).text()
-        else:
-            return ""
+    def itemText(self, index) -> str:
+        return self._model.item(index).text()
 
-    def itemInfo(self, index: int) -> ItemInfo:
-        itemInfo = self.ItemInfo()
-        if 0 <= index < self._model.rowCount():
-            item = self._model.item(index)
-            itemInfo.index = index
-            itemInfo.text = item.text()
-            itemInfo.data = item.data(Qt.ItemDataRole.UserRole + 1)
-            itemInfo.isCheck = item.checkState() == Qt.CheckState.Checked
-        return itemInfo
+    def itemInfo(self, index) -> ItemInfo:
+        item = self._model.item(index)
+        return self.ItemInfo(index, item.text(), item.data(), item.checkState() == Qt.CheckState.Checked)
 
     def findItem(self, data: Any) -> int:
         for i in range(self._model.rowCount()):
-            item = self._model.item(i)
-            if item.data(Qt.ItemDataRole.UserRole + 1) == data:
+            if self._model.item(i).data() == data:
                 return i
         return -1
 
@@ -154,23 +124,54 @@ class LMultiComboBox(QComboBox):
             self.hidedPopup.emit()
             super().hidePopup()
 
-    def mousePressEvent(self, e: QMouseEvent):
-        super().mousePressEvent(e)
-        e.accept()
+    def mousePressEvent(self, event: QMouseEvent):
+        super().mousePressEvent(event)
+        event.accept()
 
-    def mouseReleaseEvent(self, e: QMouseEvent):
-        super().mouseReleaseEvent(e)
-        e.accept()
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        super().mouseReleaseEvent(event)
+        event.accept()
 
     def mouseMoveEvent(self, event: QMouseEvent):
         super().mouseMoveEvent(event)
         event.accept()
 
+    def updateText(self):
+        selected = [self._model.item(i).text() for i in range(self._model.rowCount()) if
+                    self._model.item(i).checkState() == Qt.CheckState.Checked]
+        self._lineEdit.setText(",".join(selected))
+        self._lineEdit.setToolTip("\n".join(selected))
+
     @Slot(int)
-    def selectActivated(self, index: int):
+    def selectActivated(self, index):
         item = self._model.item(index)
-        item.setCheckState(Qt.CheckState.Checked if item.checkState() == Qt.CheckState.Unchecked
-                           else Qt.CheckState.Unchecked)
+        item.setCheckState(
+            Qt.CheckState.Unchecked if item.checkState() == Qt.CheckState.Checked else Qt.CheckState.Checked)
         self.updateText()
         self.itemStateChanged.emit()
 
+
+class LCompleteComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._completer = QCompleter()
+        self.setEditable(True)
+        self.setCompleter(self._completer)
+        self._completer.setFilterMode(Qt.MatchContains)
+        self._completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self._completer.setModel(self.model())
+
+    def setFilterMode(self, mode: Qt.MatchFlag):
+        self._completer.setFilterMode(mode)
+
+    def filterMode(self) -> Qt.MatchFlag:
+        return self._completer.filterMode()
+
+    def setCaseSensitivity(self, caseSensitivity: Qt.CaseSensitivity):
+        self._completer.setCaseSensitivity(caseSensitivity)
+
+    def caseSensitivity(self) -> Qt.CaseSensitivity:
+        return self._completer.caseSensitivity()
+
+    def paintEvent(self, event):
+        super().paintEvent(event)

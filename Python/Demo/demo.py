@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QListWidget, QListWidgetItem,QWidget
 
 from LWidget.LComboBox import *
 
@@ -9,6 +9,7 @@ class DemoWidget(QMainWindow):
         widget = QWidget()
         self._layout = QHBoxLayout()
         lists = ["LMultiComboBox(多选下拉列表)",
+                 "LCompleteComboBox(补全下拉列表)"
                  ]
         self._listWidget = QListWidget()
         self._listWidget.addItems(lists)
@@ -26,7 +27,11 @@ class DemoWidget(QMainWindow):
         match text:
             case "LMultiComboBox(多选下拉列表)":
                 comboBox = LMultiComboBox()
-                comboBox.addItems({"APPLE": True, "ORANGE": True, "BANANA": True})
+                comboBox.addItems({"APPLE": False, "ORANGE": False, "BANANA": False})
+                widget = comboBox
+            case "LCompleteComboBox(补全下拉列表)":
+                comboBox = LCompleteComboBox()
+                comboBox.addItems(["APPLE", "ORANGE", "BANANA"])
                 widget = comboBox
             case _:
                 pass
