@@ -1,2 +1,6 @@
 #include "func.h"
+#include "LConfig.h"
+#include "LInIConfig.h"
+#include "LJsonConfig.h"
+#include "LXmlConfig.h"
 using namespace ljz;

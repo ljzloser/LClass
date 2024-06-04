@@ -3,6 +3,9 @@
 #include <LWidget>
 #include <QLinearGradient>
 #include <QMessageBox>
+
+#include "LJsonConfig.h"
+
 Demo::Demo(QWidget* parent)
 	: QMainWindow(parent)
 {
@@ -19,6 +22,14 @@ Demo::Demo(QWidget* parent)
 		"LPixmapButton(图片按钮)"
 	};
 	ui.listWidget->addItems(list);
+	LJsonConfig* config = new LJsonConfig(QApplication::applicationDirPath() + "/config.json");
+	config->init(QJsonDocument::fromJson("{}"));
+	bool flag = config->write("names", list);
+	if (!flag)
+	{
+		QString name = config->errorString();
+	}
+	delete config;
 }
 void Demo::doWork(QListWidgetItem* item)
 {
@@ -27,7 +38,7 @@ void Demo::doWork(QListWidgetItem* item)
 	if (text.contains("LMultiComboBox"))
 	{
 		LMultiComboBox* combo = new LMultiComboBox(this);
-        combo->addItems({ "APPLE", "apple", "3" });
+		combo->addItems({ "APPLE", "apple", "3" });
 		widget = combo;
 	}
 	else if (text.contains("LCompleteComboBox"))

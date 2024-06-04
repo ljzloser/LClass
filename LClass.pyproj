@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{c91be097-ab58-4ec4-9935-35a658b8e28a}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile />
+    <SearchPath>Python\</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|3.12</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="CMakeLists.txt" />
+    <Content Include="Demo\CMakeLists.txt" />
+    <Content Include="Demo\resource\res\start.png" />
+    <Content Include="Demo\resource\res\stop.png" />
+    <Content Include="Demo\x64\Debug\Demo.vcxproj.FileListAbsolute.txt" />
+    <Content Include="Demo\x64\Release\Demo.vcxproj.FileListAbsolute.txt" />
+    <Content Include="LCore\CMakeLists.txt" />
+    <Content Include="LCore\x64\Debug\LCore.vcxproj.FileListAbsolute.txt" />
+    <Content Include="LCore\x64\Release\LCore.vcxproj.FileListAbsolute.txt" />
+    <Content Include="LICENSE.txt" />
+    <Content Include="LWidget\CMakeLists.txt" />
+    <Content Include="LWidget\resource\res\clear.png" />
+    <Content Include="LWidget\resource\res\down.png" />
+    <Content Include="LWidget\resource\res\file.png" />
+    <Content Include="LWidget\resource\res\searchResult.png" />
+    <Content Include="LWidget\resource\res\up.png" />
+    <Content Include="LWidget\x64\Debug\LWidget.vcxproj.FileListAbsolute.txt" />
+    <Content Include="Python\LWidget\resource\res\clear.png" />
+    <Content Include="Python\LWidget\resource\res\down.png" />
+    <Content Include="Python\LWidget\resource\res\file.png" />
+    <Content Include="Python\LWidget\resource\res\searchResult.png" />
+    <Content Include="Python\LWidget\resource\res\up.png" />
+    <Content Include="x64\build\linux-6_7_0-Debug\CMakeCache.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\CMakeFiles\TargetDirectories.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\Demo\CMakeFiles\Demo_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\Demo\CMakeFiles\Demo_autogen.dir\AutoRcc_Demo_6WJNPILU4A_Used.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\Demo\CMakeFiles\Demo_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\LCore\CMakeFiles\LCore_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\LCore\CMakeFiles\LCore_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\AutoRcc_Resource_6WJNPILU4A_Used.txt" />
+    <Content Include="x64\build\linux-6_7_0-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\CMakeCache.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\CMakeFiles\TargetDirectories.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\Demo\CMakeFiles\Demo_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\Demo\CMakeFiles\Demo_autogen.dir\AutoRcc_Demo_6WJNPILU4A_Used.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\Demo\CMakeFiles\Demo_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\LCore\CMakeFiles\LCore_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\LCore\CMakeFiles\LCore_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\AutogenUsed.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\AutoRcc_Resource_6WJNPILU4A_Used.txt" />
+    <Content Include="x64\build\linux-6_7_1-Debug\LWidget\CMakeFiles\LWidget_autogen.dir\ParseCache.txt" />
+    <Content Include="x64\build\linux-Debug\CMakeCache.txt" />
+    <Content Include="x64\build\linux-Debug\CMakeFiles\TargetDirectories.txt" />
+    <Content Include="x64\build\windows-6_6_3-Debug\CMakeCache.txt" />
+    <Content Include="x64\build\windows-6_6_3-Debug\CMakeFiles\TargetDirectories.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Demo\resource\Demo_rc.py" />
+    <Compile Include="Python\Demo\demo.py" />
+    <Compile Include="Python\Demo\main.py" />
+    <Compile Include="Python\LCore\LFunc.py" />
+    <Compile Include="Python\LCore\__init__.py" />
+    <Compile Include="Python\LWidget\LButton.py" />
+    <Compile Include="Python\LWidget\LComboBox.py" />
+    <Compile Include="Python\LWidget\LTextEdit.py" />
+    <Compile Include="Python\LWidget\resource\Resource_rc.py" />
+    <Compile Include="Python\LWidget\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Demo" />
+    <Folder Include="Demo\resource" />
+    <Folder Include="Demo\resource\res" />
+    <Folder Include="Demo\x64\" />
+    <Folder Include="Demo\x64\Debug" />
+    <Folder Include="Demo\x64\Release" />
+    <Folder Include="LCore" />
+    <Folder Include="LCore\x64\" />
+    <Folder Include="LCore\x64\Debug" />
+    <Folder Include="LCore\x64\Release" />
+    <Folder Include="LWidget" />
+    <Folder Include="LWidget\resource\" />
+    <Folder Include="LWidget\resource\res" />
+    <Folder Include="LWidget\x64\" />
+    <Folder Include="LWidget\x64\Debug" />
+    <Folder Include="Python\" />
+    <Folder Include="Python\Demo" />
+    <Folder Include="Python\LCore" />
+    <Folder Include="Python\LWidget" />
+    <Folder Include="Python\LWidget\resource" />
+    <Folder Include="Python\LWidget\resource\res" />
+    <Folder Include="x64\" />
+    <Folder Include="x64\build\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\CMakeFiles" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\Demo\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\Demo\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\Demo\CMakeFiles\Demo_autogen.dir" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LCore\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LCore\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LCore\CMakeFiles\LCore_autogen.dir" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LWidget\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LWidget\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_0-Debug\LWidget\CMakeFiles\LWidget_autogen.dir" />
+    <Folder Include="x64\build\linux-6_7_1-Debug" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\CMakeFiles" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\Demo\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\Demo\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\Demo\CMakeFiles\Demo_autogen.dir" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LCore\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LCore\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LCore\CMakeFiles\LCore_autogen.dir" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LWidget\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LWidget\CMakeFiles\" />
+    <Folder Include="x64\build\linux-6_7_1-Debug\LWidget\CMakeFiles\LWidget_autogen.dir" />
+    <Folder Include="x64\build\linux-Debug" />
+    <Folder Include="x64\build\linux-Debug\CMakeFiles" />
+    <Folder Include="x64\build\windows-6_6_3-Debug" />
+    <Folder Include="x64\build\windows-6_6_3-Debug\CMakeFiles" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.12" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

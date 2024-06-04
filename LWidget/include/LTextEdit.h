@@ -39,7 +39,6 @@ namespace ljz
 		QTableView* _tableView = new QTableView(this);
 		QLabel* _label = new QLabel(this);
 	};
-
 	class LFindItemDialogDelegate final :public QStyledItemDelegate
 	{
 	public:
@@ -49,7 +48,6 @@ namespace ljz
 	private:
 		void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	};
-
 	/**
 	 * 这里是为了处理回车等按键在textEdit 和 lineEdit 中同时触发的问题。
 	 */
@@ -63,7 +61,6 @@ namespace ljz
 	protected:
 		bool eventFilter(QObject* watched, QEvent* event) override;
 	};
-
 	class NoNewlineValidator : public QValidator
 	{
 	public:
@@ -156,7 +153,6 @@ namespace ljz
 		void keyReleaseEvent(QKeyEvent* event) override;
 		void showEvent(QShowEvent* event) override;
 	};
-
 	class LWIDGET_EXPORT LTextEdit final :public QPlainTextEdit
 	{
 		Q_OBJECT
