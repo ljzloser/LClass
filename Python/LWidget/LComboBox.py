@@ -67,7 +67,7 @@ class LMultiComboBox(QComboBox):
         item.setCheckable(True)
         item.setCheckState(Qt.CheckState.Checked if isCheck
                            else Qt.CheckState.Unchecked)
-        item.setData(data, role=Qt.ItemDataRole.UserRole + 1)
+        item.setData(str, role=Qt.ItemDataRole.UserRole + 1)
         self._model.appendRow(item)
         self.updateText()
 
