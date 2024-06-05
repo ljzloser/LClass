@@ -371,3 +371,4 @@ FodyWeavers.xsd
 /LWidget/LWidget_autogen
 /LWidget/cmake_install.cmake
 /Python/.idea
+/Python/LWidget/resource/Resource_rc.py
