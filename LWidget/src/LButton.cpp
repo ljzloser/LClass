@@ -159,6 +159,11 @@ LSwitchButton::LSwitchButton(QWidget* parent)
 
 LSwitchButton::~LSwitchButton() = default;
 
+void LSwitchButton::setObjectName(const QString& name)
+{
+	QObject::setObjectName(name);
+}
+
 void LSwitchButton::paintEvent(QPaintEvent* e)
 {
 	QPainter painter(this);

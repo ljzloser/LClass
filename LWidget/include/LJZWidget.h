@@ -62,6 +62,8 @@ namespace ljz
 		//设置最大化按钮图标
 		QIcon setMaxButtonIcon(const QIcon& icon);
 		QWidget* getMaxButton() override { return this->maxButton; }
+		QWidget* getMinButton() { return this->minButton; }
+		QWidget* getCloseButton() { return this->closeButton; }
 		QIcon setMaxButtonIcon(const QString& iconPath);
 		//设置还原按钮图标
 		QIcon setRestoreButtonIcon(const QIcon& icon);
@@ -76,6 +78,7 @@ namespace ljz
 
 	protected:
 		void mouseDoubleClickEvent(QMouseEvent* event) override;
+		void focusOutEvent(QFocusEvent* event) override;
 
 	public slots:
 		void updateIcon() override; //更新按钮图标
@@ -130,6 +133,7 @@ namespace ljz
 		bool nativeEvent(const QByteArray& eventType, void* message, long* result);
 #endif
 		bool eventFilter(QObject* obj, QEvent* event) override;
+		void focusOutEvent(QFocusEvent* event) override;
 	signals:
 		void windowStateChanged();
 		/**

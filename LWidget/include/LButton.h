@@ -85,6 +85,7 @@ namespace ljz
 
 		explicit LSwitchButton(QWidget* parent = nullptr);
 		~LSwitchButton() override;
+		void setObjectName(const QString& name);
 	signals:
 		// 状态改变
 		void stateChanged(const State& state, const StateInfo& info);
