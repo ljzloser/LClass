@@ -3,4 +3,6 @@
 #include "LInIConfig.h"
 #include "LJsonConfig.h"
 #include "LXmlConfig.h"
+#include "LSingleApplication.h"
+
 using namespace ljz;

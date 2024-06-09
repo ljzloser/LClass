@@ -37,12 +37,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.6.3_msvc2019_64</QtInstall>
-    <QtModules>core;gui;xml</QtModules>
+    <QtModules>core;gui;network;widgets;xml</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.6.1_msvc2019_64</QtInstall>
-    <QtModules>core;gui;xml</QtModules>
+    <QtModules>core;gui;network;widgets;xml</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -110,6 +110,7 @@
     <ClInclude Include="include\LConfig.h" />
     <ClInclude Include="include\LInIConfig.h" />
     <ClInclude Include="include\LJsonConfig.h" />
+    <QtMoc Include="include\LSingleApplication.h" />
     <ClInclude Include="include\LXmlConfig.h" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,7 @@
     <ClCompile Include="src\LConfig.cpp" />
     <ClCompile Include="src\LInIConfig.cpp" />
     <ClCompile Include="src\LJsonConfig.cpp" />
+    <ClCompile Include="src\LSingleApplication.cpp" />
     <ClCompile Include="src\LXmlConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
