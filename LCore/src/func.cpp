@@ -48,12 +48,15 @@ QString LFunc::escapeString(QString text, bool escape) {
 	}
 	return text;
 }
+#ifdef WIN32
 bool LFunc::IsSystemDarkModeActive()
 {
 	QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
 	QVariant themeValue = settings.value("AppsUseLightTheme", QVariant(1)); // 默认使用浅色主题
 	return themeValue.isValid() && themeValue.toInt() == 0;
 }
+#endif
+
 void LFunc::autoRun(int isAutoRun, QString appName)
 {
 	QString appPath = QCoreApplication::applicationFilePath();
@@ -99,4 +102,14 @@ void LFunc::autoRun(int isAutoRun, QString appName)
 		}
 	}
 #endif
+}
+
+QString LFunc::truncateString(const QString& str, int length)
+{
+	QString truncatedStr;
+	if (str.length() <= length)
+		truncatedStr = str;
+	else
+		QString truncatedStr = str.left(static_cast<qsizetype>(length) - 3) + "..."; // 留出三个位置给 "..."
+	return truncatedStr;
 }

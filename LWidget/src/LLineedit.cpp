@@ -1,5 +1,7 @@
 ﻿#include "LLineedit.h"
 
+#include <QTimer>
+
 using namespace ljz;
 
 LFileLineEdit::Info::Info(QFileDialog::FileMode mode, const QString& path, const QString& title,
@@ -101,4 +103,20 @@ void LFileLineEdit::init()
 			emit this->fileCleared();
 		});
 	reAction();
+}
+
+LFocusSelectLineEdit::LFocusSelectLineEdit(QWidget* parent)
+	:QLineEdit(parent)
+{
+}
+
+LFocusSelectLineEdit::LFocusSelectLineEdit(const QString& text, QWidget* parent)
+	:QLineEdit(text, parent)
+{
+}
+
+void LFocusSelectLineEdit::focusInEvent(QFocusEvent* event)
+{
+	QLineEdit::focusInEvent(event);
+	QTimer::singleShot(100, this, SLOT(selectAll()));
 }

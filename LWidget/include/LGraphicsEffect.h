@@ -7,7 +7,7 @@
 
 namespace ljz
 {
-	class LWIDGET_EXPORT LAnimationOpacityEffect final : public QGraphicsOpacityEffect
+	class LWIDGET_EXPORT LAnimationOpacityEffect : public QGraphicsOpacityEffect
 	{
 		Q_OBJECT
 	signals:

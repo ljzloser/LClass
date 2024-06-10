@@ -76,10 +76,11 @@ void LFindItemDialogDelegate::paint(QPainter* painter, const QStyleOptionViewIte
 			QString left = content.left(from).toHtmlEscaped();
 			QString mid = content.mid(from, to - from).toHtmlEscaped();
 			QString right = content.right(content.length() - to).toHtmlEscaped();
-			QString highlightText = QString(R"(<span>%1</span><span style="background-color: yellow;">%2</span><span>%3</span>)")
+			QString highlightText = QString(R"(<span style="color: %4;">%1</span><span style="background-color: yellow; color: %4;">%2</span><span style="color: %4;">%3</span>)")
 				.arg(LFunc::replaceSpaceToHtml(left))
 				.arg(LFunc::replaceSpaceToHtml(mid))
-				.arg(LFunc::replaceSpaceToHtml(right));
+				.arg(LFunc::replaceSpaceToHtml(right))
+				.arg(option.palette.text().color().name());
 			auto document = new QTextDocument();
 			document->setHtml(highlightText);
 			option.widget->style()->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);

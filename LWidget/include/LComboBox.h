@@ -3,14 +3,13 @@
 #include <QComboBox>
 #include <QStandardItemModel>
 #include <QListView>
-#include <QLineEdit>
 #include <QMouseEvent>
 #include <QEvent>
 #include <QCompleter>
-
+#include "LLineedit.h"
 namespace ljz
 {
-	class KeyPressEater final :public QObject
+	class KeyPressEater :public QObject
 	{
 		Q_OBJECT
 	public:
@@ -25,7 +24,7 @@ namespace ljz
 	/**
 	 * 多选下拉列表
 	 */
-	class LWIDGET_EXPORT LMultiComboBox final :public QComboBox
+	class LWIDGET_EXPORT LMultiComboBox :public QComboBox
 	{
 		Q_OBJECT
 	public:
@@ -75,7 +74,7 @@ namespace ljz
 	/**
 	 * 补全下拉列表
 	 */
-	class LWIDGET_EXPORT LCompleteComboBox final :public QComboBox
+	class LWIDGET_EXPORT LCompleteComboBox :public QComboBox
 	{
 		Q_OBJECT
 	public:

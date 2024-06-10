@@ -39,7 +39,7 @@ namespace ljz
 		QTableView* _tableView = new QTableView(this);
 		QLabel* _label = new QLabel(this);
 	};
-	class LFindItemDialogDelegate final :public QStyledItemDelegate
+	class LFindItemDialogDelegate :public QStyledItemDelegate
 	{
 	public:
 		explicit LFindItemDialogDelegate(QWidget* parent = nullptr) :QStyledItemDelegate(parent) {}
@@ -51,7 +51,7 @@ namespace ljz
 	/**
 	 * 这里是为了处理回车等按键在textEdit 和 lineEdit 中同时触发的问题。
 	 */
-	class LTextEditKeyPress final :public QObject
+	class LTextEditKeyPress :public QObject
 	{
 		Q_OBJECT
 	public:
@@ -71,7 +71,7 @@ namespace ljz
 			return Acceptable;
 		}
 	};
-	class LSearchHighlighter final :public QSyntaxHighlighter
+	class LSearchHighlighter :public QSyntaxHighlighter
 	{
 		Q_OBJECT
 	public:
@@ -121,7 +121,7 @@ namespace ljz
 		QBrush _findGround;
 		bool _isHighlight = false;
 	};
-	class LWIDGET_EXPORT LTextEditToolWidget final :public QFrame
+	class LWIDGET_EXPORT LTextEditToolWidget :public QFrame
 	{
 		Q_OBJECT
 	public:
@@ -153,7 +153,7 @@ namespace ljz
 		void keyReleaseEvent(QKeyEvent* event) override;
 		void showEvent(QShowEvent* event) override;
 	};
-	class LWIDGET_EXPORT LTextEdit final :public QPlainTextEdit
+	class LWIDGET_EXPORT LTextEdit :public QPlainTextEdit
 	{
 		Q_OBJECT
 	public:
@@ -209,7 +209,7 @@ namespace ljz
 		void paintEvent(QPaintEvent* event) override;
 		void findItemClicked(FindItemInfo info);
 	};
-	class LWIDGET_EXPORT LLineNumberArea final : public QWidget
+	class LWIDGET_EXPORT LLineNumberArea : public QWidget
 	{
 	public:
 		LLineNumberArea(LTextEdit* editor) : QWidget(editor), codeEditor(editor) {}

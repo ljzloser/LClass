@@ -8,7 +8,7 @@
 
 namespace ljz
 {
-	class LWIDGET_EXPORT LNavigationBar final :public QWidget
+	class LWIDGET_EXPORT LNavigationBar :public QWidget
 	{
 		struct Item
 		{

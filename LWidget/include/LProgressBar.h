@@ -139,7 +139,7 @@ namespace ljz
 	 * This is a progress bar with wave effect.\n
 	 * 这是带波纹效果的进度条\n
 	 */
-	class LWIDGET_EXPORT LWaveProgressBar final : public LCircularBaseProgressBar
+	class LWIDGET_EXPORT LWaveProgressBar : public LCircularBaseProgressBar
 	{
 		Q_OBJECT
 			Q_PROPERTY(qreal wavePhase READ wavePhase WRITE setWavePhase)
@@ -187,7 +187,7 @@ namespace ljz
 	 * This is a progress bar with ring effect.\n
 	 * 这是环形效果的进度条
 	 */
-	class LWIDGET_EXPORT LRingProgressBar final : public LCircularBaseProgressBar
+	class LWIDGET_EXPORT LRingProgressBar : public LCircularBaseProgressBar
 	{
 	public:
 		struct ColorInfo

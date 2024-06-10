@@ -194,6 +194,7 @@ void LMultiComboBox::selectActivated(int index)
 LCompleteComboBox::LCompleteComboBox(QWidget* parent)
 	:QComboBox(parent)
 {
+	this->setLineEdit(new LFocusSelectLineEdit());
 	this->_completer = new QCompleter();
 	this->setEditable(true);
 	this->setCompleter(this->_completer);

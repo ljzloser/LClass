@@ -4,5 +4,7 @@
 #include "LJsonConfig.h"
 #include "LXmlConfig.h"
 #include "LSingleApplication.h"
+#include "LSqlExecutor.h"
+#include "LLog.h"
 
 using namespace ljz;

@@ -28,7 +28,7 @@ namespace ljz
 	/**
 	 * 开关按钮控件
 	 */
-	class LWIDGET_EXPORT LSwitchButton final : public QAbstractButton
+	class LWIDGET_EXPORT LSwitchButton : public QAbstractButton
 	{
 		Q_OBJECT
 			Q_PROPERTY(QPointF position READ position WRITE setPosition)

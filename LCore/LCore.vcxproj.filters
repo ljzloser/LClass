@@ -44,6 +44,12 @@
     <ClInclude Include="include\LXmlConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\LSqlExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\func.cpp">

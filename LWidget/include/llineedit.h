@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QFileDialog>
 namespace ljz {
-	class LWIDGET_EXPORT LFileLineEdit final : public QLineEdit
+	class LWIDGET_EXPORT LFileLineEdit : public QLineEdit
 	{
 		Q_OBJECT
 	public:
@@ -45,6 +45,16 @@ namespace ljz {
 		Info _info;
 		void reAction();
 		void init();
+	};
+	class LWIDGET_EXPORT LFocusSelectLineEdit : public QLineEdit
+	{
+		Q_OBJECT
+	public:
+		explicit LFocusSelectLineEdit(QWidget* parent = nullptr);
+		explicit LFocusSelectLineEdit(const QString& text, QWidget* parent = nullptr);
+		~LFocusSelectLineEdit() override = default;
+	protected:
+		void focusInEvent(QFocusEvent* event) override;
 	};
 }
 

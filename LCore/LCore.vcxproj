@@ -36,13 +36,13 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.6.3_msvc2019_64</QtInstall>
-    <QtModules>core;gui;network;widgets;xml</QtModules>
+    <QtInstall>6.6.1_msvc2019_64</QtInstall>
+    <QtModules>core;gui;network;widgets;sql;xml</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.6.1_msvc2019_64</QtInstall>
-    <QtModules>core;gui;network;widgets;xml</QtModules>
+    <QtModules>core;gui;network;widgets;sql;xml</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -111,6 +111,8 @@
     <ClInclude Include="include\LInIConfig.h" />
     <ClInclude Include="include\LJsonConfig.h" />
     <QtMoc Include="include\LSingleApplication.h" />
+    <ClInclude Include="include\LLog.h" />
+    <ClInclude Include="include\LSqlExecutor.h" />
     <ClInclude Include="include\LXmlConfig.h" />
   </ItemGroup>
   <ItemGroup>
