@@ -30,6 +30,9 @@ Demo::Demo(QWidget* parent)
 		QString name = config->errorString();
 	}
 	delete config;
+	QString text = LFunc::FString("现在的时间是", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"), "时间戳为",
+		QDateTime::currentDateTime().toMSecsSinceEpoch());
+	QMessageBox::information(this, "提示", text);
 }
 void Demo::doWork(QListWidgetItem* item)
 {
