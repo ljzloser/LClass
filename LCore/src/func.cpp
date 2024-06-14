@@ -1,5 +1,9 @@
 ﻿#include "func.h"
 #include <QCoreApplication>
+#ifdef WIN32
+#include <windows.h>
+#endif
+#include <QColor>
 using namespace ljz;
 
 QString LFunc::escapeSpecialCharacters(const QString& text)
@@ -55,6 +59,28 @@ bool LFunc::IsSystemDarkModeActive()
 	QVariant themeValue = settings.value("AppsUseLightTheme", QVariant(1)); // 默认使用浅色主题
 	return themeValue.isValid() && themeValue.toInt() == 0;
 }
+QColor LFunc::getSystemAccentColor() {
+	DWORD colorValue;
+	DWORD colorSize = sizeof(colorValue);
+	LONG result = RegGetValue(HKEY_CURRENT_USER,
+		L"SOFTWARE\\Microsoft\\Windows\\DWM",
+		L"AccentColor",
+		RRF_RT_REG_DWORD,
+		nullptr,
+		&colorValue,
+		&colorSize);
+	if (result == ERROR_SUCCESS) {
+		// Windows stores colors as ABGR
+		int red = (colorValue >> 0) & 0xFF;
+		int green = (colorValue >> 8) & 0xFF;
+		int blue = (colorValue >> 16) & 0xFF;
+		return QColor(red, green, blue);
+	}
+	else {
+		qWarning() << "Failed to get accent color from registry";
+		return QColor(); // Return default color if reading fails
+	}
+}
 #endif
 
 void LFunc::autoRun(int isAutoRun, QString appName)
@@ -94,7 +120,7 @@ void LFunc::autoRun(int isAutoRun, QString appName)
 			QTextStream out(&desktopFile);
 			out << desktopFileContent;
 			desktopFile.close();
-		}
+}
 	}
 	else {
 		if (desktopFile.exists()) {

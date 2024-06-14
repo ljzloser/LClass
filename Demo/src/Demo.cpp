@@ -19,7 +19,8 @@ Demo::Demo(QWidget* parent)
 #ifdef WIN32
 		"LWidget(自定义窗口)",
 #endif
-		"LPixmapButton(图片按钮)"
+		"LPixmapButton(图片按钮)",
+		"LHostAddressLineEdit(IPV4地址文本框)",
 	};
 	ui.listWidget->addItems(list);
 	LJsonConfig* config = new LJsonConfig(QApplication::applicationDirPath() + "/config.json");
@@ -30,6 +31,9 @@ Demo::Demo(QWidget* parent)
 		QString name = config->errorString();
 	}
 	delete config;
+	QString text = LFunc::FString("现在的时间是", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"), "时间戳为",
+		QDateTime::currentDateTime().toMSecsSinceEpoch());
+	QMessageBox::information(this, "提示", text);
 }
 void Demo::doWork(QListWidgetItem* item)
 {
@@ -152,6 +156,19 @@ void Demo::doWork(QListWidgetItem* item)
 
 		pixmapButton->setPixmap(QPixmap(":/Demo/res/start.png"));
 		widget = pixmapButton;
+	}
+	else if (text.contains("LHostAddressLineEdit"))
+	{
+		LHostAddressLineEdit* edit = new LHostAddressLineEdit();
+		//edit->setText("192.168.0.1");
+		QHostAddress address("127.0.0.1");
+		edit->setHostAddress(address);
+		edit->setDefaultBlock(1);
+		connect(edit, &LHostAddressLineEdit::currentHostAddressChanged, [=]()
+			{
+				QMessageBox::information(this, "提示", edit->hostAddress().toString());
+			});
+		widget = edit;
 	}
 	if (widget)
 	{

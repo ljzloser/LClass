@@ -16,6 +16,7 @@ namespace ljz
 #ifdef WIN32
 		// windows10 以上读取系统是否处于深色模式
 		static bool IsSystemDarkModeActive();
+		static QColor getSystemAccentColor();
 #endif
 		/**
 		 * 开机自启动，windows系统采用注册表方式，linux系统采用配置文件方式
@@ -30,5 +31,25 @@ namespace ljz
 		 * @return
 		 */
 		static QString truncateString(const QString& str, int length);
+
+		template<typename T, typename... Args>
+		static QString FString(T&& arg, Args&&... args)
+		{
+			QString format = "";
+			int size = sizeof...(args) + 1; // 计算参数包的大小
+			for (int i = 1; i <= size; ++i) // 循环添加参数格式化标识符
+			{
+				format.append("%");
+				format.append(QString::number(i));
+			}
+
+			// 将所有参数添加到 format 中
+			QString result = format.arg(std::forward<T>(arg));
+			using expander = int[];
+			(void)expander {
+				0, (void(result = result.arg(std::forward<Args>(args))), 0)...
+			};
+			return result;
+		}
 	};
 }
