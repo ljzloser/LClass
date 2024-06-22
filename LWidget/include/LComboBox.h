@@ -7,6 +7,10 @@
 #include <QEvent>
 #include <QCompleter>
 #include "LLineedit.h"
+#include <QNetworkInterface>
+
+#include "LJZWidget.h"
+
 namespace ljz
 {
 	class KeyPressEater :public QObject
@@ -93,9 +97,47 @@ namespace ljz
 		QCompleter* _completer;
 		void paintEvent(QPaintEvent* e) override;
 	};
-
-	class LWIDGET_EXPORT LWidgetComboBox :public QWidget
+	typedef  QList<QHostAddress> QHostAddressList;
+	class LHostAddressCompleter :public QCompleter
 	{
+		Q_OBJECT
 	public:
+		explicit LHostAddressCompleter(QWidget* parent = nullptr);
+	protected:
+		QStringList splitPath(const QString& path) const override;
+	};
+
+	class LWIDGET_EXPORT LHostAddressComboBox :public QComboBox
+	{
+		Q_OBJECT
+	public:
+		explicit LHostAddressComboBox(bool loadAllInterfaces, QWidget* parent = nullptr);
+		explicit LHostAddressComboBox(QWidget* parent = nullptr);
+		~LHostAddressComboBox() override;
+		void addItem(const QHostAddress& address);
+		void addItem(const QString& address);
+		void addItems(const QHostAddressList& addresses);
+		void addItems(const QStringList& addresses);
+		void removeItem(const int index);
+		void insertItem(const int index, const QHostAddress& address);
+		void insertItem(const int index, const QString& address);
+		void insertItems(const int index, const QHostAddressList& addresses);
+		void insertItems(const int index, const QStringList& addresses);
+		[[nodiscard]] QHostAddress currentHostAddress() const;
+		void setCurrentHostAddress(const QHostAddress& address);
+		int findHostAddress(const QString& address);
+		int findHostAddress(const QHostAddress& address);
+		[[nodiscard]] QHostAddress itemHostAddress(int index) const;
+		[[nodiscard]] LHostAddressEdit* lineEdit() const;
+		void setLineEdit(LHostAddressEdit* edit);
+		[[nodiscard]] QStringList hostAddressStringList() const;
+		[[nodiscard]] QHostAddressList hostAddressList() const;
+	public slots:
+
+	signals:
+		void currentHostAddressChanged(const QHostAddress& address);
+	private:
+		LHostAddressEdit* _edit = new LHostAddressEdit(this);
+		LHostAddressCompleter* _complter = new LHostAddressCompleter(this);
 	};
 }

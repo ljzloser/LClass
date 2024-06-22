@@ -1,4 +1,5 @@
 ﻿#include "LComboBox.h"
+
 using namespace ljz;
 bool KeyPressEater::eventFilter(QObject* watched, QEvent* event)
 {
@@ -226,4 +227,158 @@ Qt::CaseSensitivity LCompleteComboBox::caseSensitivity() const
 void LCompleteComboBox::paintEvent(QPaintEvent* e)
 {
 	QComboBox::paintEvent(e);
+}
+
+LHostAddressCompleter::LHostAddressCompleter(QWidget* parent)
+	:QCompleter(parent)
+{
+}
+
+QStringList LHostAddressCompleter::splitPath(const QString& path) const
+{
+	LHostAddressComboBox* comboBox = qobject_cast<LHostAddressComboBox*>(this->parent());
+	LHostAddressEdit* edit = comboBox->lineEdit();
+	int block = edit->currentBlock();
+	QStringList list;
+	list << path.split(".").mid(0, block + 1).join(".");
+	return list;
+}
+
+LHostAddressComboBox::LHostAddressComboBox(bool loadAllInterfaces, QWidget* parent)
+	:QComboBox(parent)
+{
+	this->setLineEdit(_edit);
+	if (loadAllInterfaces)
+	{
+		QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+		foreach(QNetworkInterface interface, interfaces)
+		{
+			QList<QNetworkAddressEntry> entries = interface.addressEntries();
+			foreach(QNetworkAddressEntry entry, entries)
+			{
+				this->addItem(entry.ip().toString());
+			}
+		}
+	}
+	this->setCompleter(_complter);
+	_complter->setModel(this->model());
+	connect(this, &QComboBox::currentTextChanged, [=](const QString& text)
+		{
+			emit this->currentHostAddressChanged(QHostAddress(text));
+		});
+}
+
+LHostAddressComboBox::LHostAddressComboBox(QWidget* parent)
+	:LHostAddressComboBox(false, parent)
+{
+}
+
+LHostAddressComboBox::~LHostAddressComboBox() = default;
+
+void LHostAddressComboBox::addItem(const QHostAddress& address)
+{
+	if (address.isNull() || address.protocol() != QAbstractSocket::IPv4Protocol) return;
+	QString ip = address.toString();
+	if (this->findText(ip) == -1)
+		QComboBox::addItem(ip);
+}
+
+void LHostAddressComboBox::addItem(const QString& address)
+{
+	this->addItem(QHostAddress(address));
+}
+
+void LHostAddressComboBox::addItems(const QHostAddressList& addresses)
+{
+	for (auto&& address : addresses)
+		this->addItem(address);
+}
+
+void LHostAddressComboBox::addItems(const QStringList& addresses)
+{
+	for (auto&& address : addresses)
+		this->addItem(address);
+}
+
+void LHostAddressComboBox::removeItem(const int index)
+{
+	QComboBox::removeItem(index);
+}
+
+void LHostAddressComboBox::insertItem(const int index, const QHostAddress& address)
+{
+	if (address.isNull() || address.protocol() != QAbstractSocket::IPv4Protocol) return;
+	QString ip = address.toString();
+	if (this->findText(ip) == -1)
+		QComboBox::insertItem(index, ip);
+}
+
+void LHostAddressComboBox::insertItem(const int index, const QString& address)
+{
+	this->insertItem(index, QHostAddress(address));
+}
+
+void LHostAddressComboBox::insertItems(const int index, const QHostAddressList& addresses)
+{
+	for (int i = 0; i < addresses.size(); ++i)
+		this->insertItem(index + i, addresses[i]);
+}
+
+void LHostAddressComboBox::insertItems(const int index, const QStringList& addresses)
+{
+	for (int i = 0; i < addresses.size(); ++i)
+		this->insertItem(index + i, addresses[i]);
+}
+
+QHostAddress LHostAddressComboBox::currentHostAddress() const
+{
+	return QHostAddress(this->currentText());
+}
+
+void LHostAddressComboBox::setCurrentHostAddress(const QHostAddress& address)
+{
+	if (address.isNull() || address.protocol() != QAbstractSocket::IPv4Protocol) return;
+	QComboBox::setCurrentText(address.toString());
+}
+
+int LHostAddressComboBox::findHostAddress(const QString& address)
+{
+	return this->findText(address);
+}
+
+int LHostAddressComboBox::findHostAddress(const QHostAddress& address)
+{
+	return this->findText(address.toString());
+}
+
+QHostAddress LHostAddressComboBox::itemHostAddress(int index) const
+{
+	return QHostAddress(this->itemText(index));
+}
+
+LHostAddressEdit* LHostAddressComboBox::lineEdit() const
+{
+	return _edit;
+}
+
+void LHostAddressComboBox::setLineEdit(LHostAddressEdit* edit)
+{
+	_edit = edit;
+	QComboBox::setLineEdit(_edit);
+}
+
+QStringList LHostAddressComboBox::hostAddressStringList() const
+{
+	QStringList result;
+	for (int i = 0; i < this->count(); ++i)
+		result.append(this->itemText(i));
+	return result;
+}
+
+QHostAddressList LHostAddressComboBox::hostAddressList() const
+{
+	QHostAddressList result;
+	for (int i = 0; i < this->count(); ++i)
+		result.append(QHostAddress(this->itemText(i)));
+	return result;
 }
