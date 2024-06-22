@@ -12,6 +12,9 @@ class DemoWidget(QMainWindow):
                  "LCompleteComboBox(补全下拉列表)",
                  "LSwitchButton(开关按钮)",
                  "LTextEdit(文本输入框)",
+                 "LFileLineEdit(文件路径输入框)",
+                 "LFocusSelectLineEdit(聚焦即选中输入框)",
+                 "LHostAddressLineEdit(IP地址输入框)",
                  ]
         self._listWidget = QListWidget()
         self._listWidget.addItems(lists)
@@ -49,6 +52,19 @@ class DemoWidget(QMainWindow):
 }""")
                 textEdit.setLineNumberAreaVisible(True)
                 widget = textEdit
+            case "LFileLineEdit(文件路径输入框)":
+                fileLineEdit = LFileLineEdit(self)
+                info = LFileLineEdit.Info(mode = QFileDialog.FileMode.ExistingFiles,filters=["*.txt", "*.py"])
+                fileLineEdit.setInfo(info)
+                widget = fileLineEdit
+            case "LFocusSelectLineEdit(聚焦即选中输入框)":
+                lineEdit = LFocusSelectLineEdit()
+                lineEdit.setText("Hello World")
+                widget = lineEdit
+            case "LHostAddressLineEdit(IP地址输入框)":
+                lineEdit = LHostAddressEdit()
+                lineEdit.setHostAddress(QHostAddress("127.0.0.1"))
+                widget = lineEdit
             case _:
                 pass
         if widget is not None:

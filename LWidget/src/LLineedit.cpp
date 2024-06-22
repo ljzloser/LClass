@@ -13,12 +13,22 @@ LFileLineEdit::Info::Info(QFileDialog::FileMode mode, const QString& path, const
 
 LFileLineEdit::LFileLineEdit(QWidget* parent)
 {
-	this->init();
+	this->setReadOnly(true);
+	this->_clearAction->setIcon(QIcon(":/res/res/clear.png"));
+	this->_clearAction->setToolTip("清空");
+	this->addAction(this->_clearAction, QLineEdit::TrailingPosition);
+	connect(this->_clearAction, &QAction::triggered, [=]()
+		{
+			this->clear();
+			this->setToolTip("");
+			emit this->fileCleared();
+		});
+	reAction();
 }
 
 LFileLineEdit::LFileLineEdit(const QString& text, QWidget* parent)
+	:QLineEdit(text, parent)
 {
-	this->init();
 }
 
 QAction* LFileLineEdit::action() const
@@ -91,21 +101,6 @@ void LFileLineEdit::reAction()
 	connect(this->_action, &QAction::triggered, this, &LFileLineEdit::showFileDialog);
 }
 
-void LFileLineEdit::init()
-{
-	this->setReadOnly(true);
-	this->_clearAction->setIcon(QIcon(":/res/res/clear.png"));
-	this->_clearAction->setToolTip("清空");
-	this->addAction(this->_clearAction, QLineEdit::TrailingPosition);
-	connect(this->_clearAction, &QAction::triggered, [=]()
-		{
-			this->clear();
-			this->setToolTip("");
-			emit this->fileCleared();
-		});
-	reAction();
-}
-
 LFocusSelectLineEdit::LFocusSelectLineEdit(QWidget* parent)
 	:QLineEdit(parent)
 {
@@ -141,62 +136,63 @@ QValidator::State LHostAddressValidator::validate(QString& input, int& pos) cons
 	return QValidator::State::Invalid;
 }
 
-LHostAddressLineEdit::LHostAddressLineEdit(const QHostAddress& hostAddress, QWidget* parent)
+LHostAddressEdit::LHostAddressEdit(const QHostAddress& hostAddress, QWidget* parent)
 	:QLineEdit(parent)
 {
 	this->setValidator(new LHostAddressValidator(this));
-	connect(this, &LHostAddressLineEdit::cursorPositionChanged, this, &LHostAddressLineEdit::handleCursorPositionChanged);
-	connect(this, &LHostAddressLineEdit::selectionChanged, [=]()
+	connect(this, &LHostAddressEdit::cursorPositionChanged, this, &LHostAddressEdit::handleCursorPositionChanged);
+	connect(this, &LHostAddressEdit::selectionChanged, [=]()
 		{
 			if (this->selectedText() == ".")
 				this->setSelection(this->cursorPosition(), 0);
 		});
 	this->setHostAddress(hostAddress);
-	connect(this, &QLineEdit::returnPressed, this, &LHostAddressLineEdit::newHostAddress);
-	connect(this, &QLineEdit::editingFinished, this, &LHostAddressLineEdit::newHostAddress);
+	//connect(this, &QLineEdit::editingFinished, this, &LHostAddressEdit::hostAddressEditFinish);
 }
 
-LHostAddressLineEdit::LHostAddressLineEdit(const QString& text, QWidget* parent)
-	:LHostAddressLineEdit(QHostAddress(text), parent)
+LHostAddressEdit::LHostAddressEdit(const QString& text, QWidget* parent)
+	:LHostAddressEdit(QHostAddress(text), parent)
 {
 }
 
-LHostAddressLineEdit::LHostAddressLineEdit(QWidget* parent)
-	:LHostAddressLineEdit(QHostAddress(), parent)
+LHostAddressEdit::LHostAddressEdit(QWidget* parent)
+	:LHostAddressEdit(QHostAddress(), parent)
 {
 }
 
-void LHostAddressLineEdit::setHostAddress(const QHostAddress& hostAddress)
+void LHostAddressEdit::setHostAddress(const QHostAddress& hostAddress)
 {
 	if (hostAddress.isNull() || hostAddress.toString() == _hostAddress.toString())
 	{
-		QLineEdit::setText(_hostAddress.toString());
+		if (this->text() != _hostAddress.toString())
+			QLineEdit::setText(_hostAddress.toString());
 		return;
 	}
 	_hostAddress = hostAddress;
 	QLineEdit::setText(_hostAddress.toString());
-	emit this->currentHostAddressChanged(_hostAddress);
+	emit this->hostAddressChanged(_hostAddress);
 }
 
-QHostAddress LHostAddressLineEdit::hostAddress() const
+QHostAddress LHostAddressEdit::hostAddress() const
 {
 	return _hostAddress;
 }
 
-int LHostAddressLineEdit::currentBlock() const
+int LHostAddressEdit::currentBlock() const
 {
 	return _currentblock;
 }
 
-int LHostAddressLineEdit::defaultBlock() const
+int LHostAddressEdit::defaultBlock() const
 {
 	return _defaultblock;
 }
 
-void LHostAddressLineEdit::setCurrentBlock(const int block)
+void LHostAddressEdit::setCurrentBlock(const int block)
 {
 	if (block < 0 || block > 3)
 		return;
+	this->setHostAddress(QHostAddress(this->text()));
 	QStringList ipv4 = (this->text().split("."));
 	if (ipv4[_currentblock].length() == 0)
 	{
@@ -210,40 +206,42 @@ void LHostAddressLineEdit::setCurrentBlock(const int block)
 	{
 		beginPos += ipv4[i].length();
 	}
-	this->setSelection(beginPos, ipv4[block].length());
+	if (this->hasFocus())
+		this->setSelection(beginPos, ipv4[_currentblock].length());
 	emit this->currentBlockChanged(_currentblock);
 }
 
-void LHostAddressLineEdit::setDefaultBlock(const int block)
+void LHostAddressEdit::setDefaultBlock(const int block)
 {
 	if (block >= 0 && block < 4)
 		_defaultblock = block;
 }
 
-void LHostAddressLineEdit::setText(const QString& text)
+void LHostAddressEdit::setText(const QString& text)
 {
 	QHostAddress hostAddress(text);
 	this->setHostAddress(hostAddress);
 }
 
-void LHostAddressLineEdit::newHostAddress()
+void LHostAddressEdit::hostAddressEditFinish()
 {
 	this->setHostAddress(QHostAddress(this->text()));
+	emit this->hostAddressEditFinished(_hostAddress);
 }
 
-void LHostAddressLineEdit::focusOutEvent(QFocusEvent* event)
+void LHostAddressEdit::focusOutEvent(QFocusEvent* event)
 {
 	QLineEdit::focusOutEvent(event);
-	newHostAddress();
+	hostAddressEditFinish();
 }
 
-void LHostAddressLineEdit::focusInEvent(QFocusEvent* event)
+void LHostAddressEdit::focusInEvent(QFocusEvent* event)
 {
 	QLineEdit::focusInEvent(event);
 	QTimer::singleShot(100, [=]() {this->setCurrentBlock(_defaultblock); });
 }
 
-void LHostAddressLineEdit::keyPressEvent(QKeyEvent* event)
+void LHostAddressEdit::keyPressEvent(QKeyEvent* event)
 {
 	if (this->hasSelectedText())
 	{
@@ -265,7 +263,7 @@ void LHostAddressLineEdit::keyPressEvent(QKeyEvent* event)
 	}
 }
 
-void LHostAddressLineEdit::handleCursorPositionChanged(int oldPos, int newPos)
+void LHostAddressEdit::handleCursorPositionChanged(int oldPos, int newPos)
 {
 	if (this->hasSelectedText() && this->selectedText() == this->text())
 		return;
@@ -288,7 +286,7 @@ void LHostAddressLineEdit::handleCursorPositionChanged(int oldPos, int newPos)
 		this->setCurrentBlock(newBlock);
 }
 
-void LHostAddressLineEdit::nextBlock()
+void LHostAddressEdit::nextBlock()
 {
 	this->setCurrentBlock(_currentblock + 1);
 }

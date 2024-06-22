@@ -20,7 +20,7 @@ Demo::Demo(QWidget* parent)
 		"LWidget(自定义窗口)",
 #endif
 		"LPixmapButton(图片按钮)",
-		"LHostAddressLineEdit(IPV4地址文本框)",
+		"LHostAddressEdit(IPV4地址文本框)",
 	};
 	ui.listWidget->addItems(list);
 	LJsonConfig* config = new LJsonConfig(QApplication::applicationDirPath() + "/config.json");
@@ -157,16 +157,20 @@ void Demo::doWork(QListWidgetItem* item)
 		pixmapButton->setPixmap(QPixmap(":/Demo/res/start.png"));
 		widget = pixmapButton;
 	}
-	else if (text.contains("LHostAddressLineEdit"))
+	else if (text.contains("LHostAddressEdit"))
 	{
-		LHostAddressLineEdit* edit = new LHostAddressLineEdit();
+		LHostAddressEdit* edit = new LHostAddressEdit();
 		//edit->setText("192.168.0.1");
 		QHostAddress address("127.0.0.1");
 		edit->setHostAddress(address);
-		edit->setDefaultBlock(1);
-		connect(edit, &LHostAddressLineEdit::currentHostAddressChanged, [=]()
+		//edit->setDefaultBlock(1);
+		//connect(edit, &LHostAddressEdit::hostAddressChanged, [=]()
+		//	{
+		//		QMessageBox::information(this, "提示", edit->hostAddress().toString());
+		//	});
+		connect(edit, &LHostAddressEdit::hostAddressEditFinished, [=]()
 			{
-				QMessageBox::information(this, "提示", edit->hostAddress().toString());
+				//QMessageBox::information(this, "提示输入完成", edit->hostAddress().toString());
 			});
 		widget = edit;
 	}
