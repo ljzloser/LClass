@@ -251,10 +251,10 @@ LHostAddressComboBox::LHostAddressComboBox(bool loadAllInterfaces, QWidget* pare
 	if (loadAllInterfaces)
 	{
 		QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-		foreach(QNetworkInterface interface, interfaces)
+		for (const QNetworkInterface& face : interfaces)
 		{
-			QList<QNetworkAddressEntry> entries = interface.addressEntries();
-			foreach(QNetworkAddressEntry entry, entries)
+			QList<QNetworkAddressEntry> entries = face.addressEntries();
+			for (const QNetworkAddressEntry& entry : entries)
 			{
 				this->addItem(entry.ip().toString());
 			}
