@@ -82,16 +82,12 @@ LSwitchButton::StateInfo::StateInfo(State state)
 	{
 		this->text = "On";
 		this->buttonPixmap = QPixmap();
-		this->backgroundColor = Qt::white;
-		this->textColor = Qt::black;
 		break;
 	}
 	case State::Off:
 	{
 		this->text = "Off";
 		this->buttonPixmap = QPixmap();
-		this->backgroundColor = Qt::black;
-		this->textColor = Qt::white;
 		break;
 	}
 	default:
@@ -99,8 +95,8 @@ LSwitchButton::StateInfo::StateInfo(State state)
 	}
 }
 
-LSwitchButton::StateInfo::StateInfo(QString text, QPixmap buttonPixmap, const QColor& backgroundColor,
-	const QColor& textColor) : text(std::move(text)), buttonPixmap(std::move(buttonPixmap)), backgroundColor(backgroundColor), textColor(textColor)
+LSwitchButton::StateInfo::StateInfo(QString text, QPixmap buttonPixmap)
+	: text(std::move(text)), buttonPixmap(std::move(buttonPixmap))
 {}
 
 void LSwitchButton::setStateInfo(State state, const StateInfo& stateInfo)
@@ -172,17 +168,18 @@ void LSwitchButton::paintEvent(QPaintEvent* e)
 	info.reSize(_radius);
 	bool isAnimationRunning = this->_animation->state() == QAbstractAnimation::Running;
 	double radius = this->calRadius(15) * 1.7;
-
+	QColor buttonColor = this->state() == State::On ? this->palette().color(QPalette::Button) : this->palette().color(QPalette::ButtonText);
+	QColor textColor = this->state() == State::On ? this->palette().color(QPalette::ButtonText) : this->palette().color(QPalette::Button);
 	// 绘制背景
 	painter.setPen(Qt::NoPen);
-	painter.setBrush(info.backgroundColor);
+	painter.setBrush(buttonColor);
 	painter.drawRoundedRect(_buttonRect, radius, radius);
 
 	// 如果动画运行中,绘制动画未移动到的区域背景
 	if (isAnimationRunning)
 	{
 		double width = this->state() == State::On ? _buttonRect.bottomRight().x() - _position.x() : _position.x() - _buttonRect.topLeft().x();
-		painter.setBrush(info.textColor);
+		painter.setBrush(textColor);
 		QRectF rect = QRectF(0, _buttonRect.top(), width, _buttonRect.height());
 		if (this->state() == State::On)
 			rect.moveLeft(_position.x());
@@ -192,10 +189,10 @@ void LSwitchButton::paintEvent(QPaintEvent* e)
 	}
 
 	// 绘制按钮
-	painter.setPen(info.textColor);
+	painter.setPen(textColor);
 	if (info.circlePixmap.isNull())
 	{
-		painter.setBrush(isAnimationRunning ? info.backgroundColor : info.textColor);
+		painter.setBrush(isAnimationRunning ? buttonColor : textColor);
 		painter.drawEllipse(_position, _radius, _radius);
 	}
 	else
@@ -210,7 +207,7 @@ void LSwitchButton::paintEvent(QPaintEvent* e)
 	textRect.moveCenter(_buttonRect.center().toPoint());
 	painter.drawText(textRect, Qt::AlignCenter, info.text);
 	// 绘制边框
-	painter.setPen(info.textColor);
+	painter.setPen(textColor);
 	painter.setBrush(Qt::NoBrush);
 	painter.drawRoundedRect(_buttonRect, radius, radius);
 	// 如果禁用，绘制遮罩

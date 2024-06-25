@@ -7,6 +7,7 @@
 #include <QEvent>
 #include <QObject>
 #include <QPushButton>
+#include <QApplication>
 namespace ljz
 {
 	class LWIDGET_EXPORT LPixmapButton : public QPushButton
@@ -51,8 +52,6 @@ namespace ljz
 		{
 			QString text = QString();			// 文本
 			QPixmap buttonPixmap = QPixmap(); 	// 按钮图标
-			QColor backgroundColor = QColor();	// 背景颜色
-			QColor textColor = QColor();		// 文本颜色
 			QPixmap circlePixmap = QPixmap();	// 圆形图标 这里不需要设置值，内部会自动计算
 			void reSize(double radius);			// 重新计算圆形图标
 			explicit StateInfo(State state);
@@ -61,10 +60,8 @@ namespace ljz
 			 *
 			 * @param text 文本
 			 * @param buttonPixmap 按钮图标
-			 * @param backgroundColor 背景颜色
-			 * @param textColor 文本颜色
 			 */
-			StateInfo(QString text, QPixmap buttonPixmap, const QColor& backgroundColor, const QColor& textColor);
+			StateInfo(QString text, QPixmap buttonPixmap);
 		};
 		// 根据状态设置状态信息
 		void setStateInfo(State state, const StateInfo& stateInfo);
