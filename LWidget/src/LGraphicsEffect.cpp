@@ -14,7 +14,7 @@ void LAnimationOpacityEffect::inAnimationStart()
 {
 	QPropertyAnimation* fadeInAnimation = new QPropertyAnimation(this, "opacity");
 	connect(fadeInAnimation, &QPropertyAnimation::finished, [=]() {emit this->inAnimationFinished(); });
-	this->setAnimation(fadeInAnimation, 0.0, 1.0);
+	this->setAnimation(fadeInAnimation, _begin, _end);
 }
 
 void LAnimationOpacityEffect::setAnimation(QPropertyAnimation* animation, const QVariant& begin, const QVariant& end) const
@@ -29,5 +29,16 @@ void LAnimationOpacityEffect::outAnimationStart()
 {
 	QPropertyAnimation* fadeOutAnimation = new QPropertyAnimation(this, "opacity");
 	connect(fadeOutAnimation, &QPropertyAnimation::finished, [=]() {emit this->outAnimationFinished(); });
-	this->setAnimation(fadeOutAnimation, 1.0, 0.0);
+	this->setAnimation(fadeOutAnimation, _end, _begin);
+}
+
+void LAnimationOpacityEffect::setRange(const QVariant& begin, const QVariant& end)
+{
+	_begin = begin;
+	_end = end;
+}
+
+QPair<QVariant, QVariant> LAnimationOpacityEffect::range() const
+{
+	return { _begin, _end };
 }

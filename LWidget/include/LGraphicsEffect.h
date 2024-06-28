@@ -31,8 +31,17 @@ namespace ljz
 		 * @brief 结束动画开始
 		*/
 		void outAnimationStart();
+		/*
+		 * @brief 设置动画的开始和结束的值
+		 */
+		void setRange(const QVariant& begin, const QVariant& end);
+		/*
+		 * @brief 获取动画的开始和结束的值
+		 */
+		std::pair<QVariant, QVariant> range()const;
 	private:
-
+		QVariant _begin{ QVariant(0.0) };
+		QVariant _end{ QVariant(0.1) };
 		int _duration = 1000;
 	};
 }
