@@ -3,6 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <QDir>
 #include <QColor>
 using namespace ljz;
 
@@ -95,7 +96,7 @@ void LFunc::autoRun(int isAutoRun, QString appName)
 	else
 		settings.remove(appName);
 #elif defined(__linux__)
-	QString autostartPath = QDir::homePath() + "/.config/autoStart/";
+    QString autostartPath = QDir::homePath() + "/.config/autoStart/";
 	QString desktopFileName = "WindowsTop.desktop";
 	QString desktopFileContent = QString(
 		"[Desktop Entry]\n"

@@ -204,7 +204,7 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 	newRect.moveCenter(rect.center());
 	path.moveTo(0, -newRect.top());
 	path.arcTo(newRect, 0, 360);
-    painter.setPen(Qt::NoPen);
+	painter.setPen(Qt::NoPen);
 	painter.setBrush(_colorInfo.backGroundBrush);
 	painter.drawPath(path);
 
@@ -230,7 +230,7 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 			path.lineTo(newStart);
 			path.lineTo(start);
 			path.setFillRule(Qt::WindingFill);
-        }
+		}
 		painter.drawPath(path);
 	}
 
@@ -248,4 +248,23 @@ void LRingProgressBar::paintEvent(QPaintEvent* event)
 	painter.drawText(textRect, Qt::AlignCenter, this->text());
 
 	this->update();
+}
+
+void LRectProgressBar::setOrientation(const Qt::Orientation orientation)
+{
+	_orientation = orientation;
+}
+
+Qt::Orientation LRectProgressBar::orientation() const
+{
+	return _orientation;
+}
+
+QSize LRectProgressBar::sizeHint() const
+{
+	return this->size() - QSize(10, 10);
+}
+
+void LRainbowProgressBar::paintEvent(QPaintEvent* event)
+{
 }

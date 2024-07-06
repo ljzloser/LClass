@@ -188,6 +188,7 @@ void Demo::doWork(QListWidgetItem* item)
 		LAnimationOpacityEffect* effect = new LAnimationOpacityEffect(ui.widget);
 		ui.widget->setGraphicsEffect(effect);
 		effect->setOpacity(0);
+        effect->setRange(0,1);
 		ui.gridLayout->addWidget(widget, 0, 1);
 		effect->inAnimationStart();
 	}

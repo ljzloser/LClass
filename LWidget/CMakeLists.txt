@@ -10,6 +10,7 @@ find_package(Qt${QT_VERSION_MAJOR}
         Core
         Gui
         Widgets
+        Network
 )
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)
@@ -35,6 +36,7 @@ target_link_libraries(LWidget
         Qt::Core
         Qt::Widgets
         Qt::Gui
+        Qt::Network
     LCore
 )
 

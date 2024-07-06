@@ -297,7 +297,9 @@ void LWidget::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing); //反锯齿
 	painter.setPen(Qt::NoPen); //无边框
+#ifdef Q_OS_WIN
 	painter.setBrush(LFunc::getSystemAccentColor()); //边框颜色
+#endif
 	painter.drawRoundedRect(this->rect(), _info.radius, _info.radius); //绘制边框
 	// 再绘制一层背景颜色的圆角矩形，大小为窗口大小减去边框大小
 	painter.setBrush(_info.backgroundColor); //背景颜色

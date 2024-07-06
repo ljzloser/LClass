@@ -4,10 +4,15 @@ project(LCore LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core )
 find_package(Qt${QT_VERSION_MAJOR}
     COMPONENTS
         Core
+        Gui
+        Widgets
+        Network
+        Sql
+        Xml
 )
 qt_standard_project_setup()
 
@@ -23,6 +28,11 @@ add_library(LCore SHARED
 target_link_libraries(LCore
     PRIVATE
         Qt::Core
+        Qt::Gui
+        Qt::Widgets
+        Qt::Network
+        Qt::Sql
+        Qt::Xml
 )
 
 target_compile_definitions(LCore

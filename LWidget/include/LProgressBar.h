@@ -223,4 +223,43 @@ namespace ljz
 		void paintEvent(QPaintEvent* event) override;
 		ColorInfo _colorInfo;
 	};
+
+	class LWIDGET_EXPORT LRectProgressBar : public LBaseProgressBar
+	{
+		Q_OBJECT
+	public:
+		explicit LRectProgressBar(QWidget* parent = nullptr)
+			:LBaseProgressBar(parent)
+		{
+		}
+		explicit LRectProgressBar(const int minimum, const int maximum, QWidget* parent = nullptr)
+			:LBaseProgressBar(minimum, maximum, parent)
+		{}
+		explicit LRectProgressBar(const LBaseProgressBar* other, QWidget* parent = nullptr)
+			:LBaseProgressBar(other, parent)
+		{}
+		void setOrientation(const Qt::Orientation orientation);
+		Qt::Orientation orientation() const;
+	protected:
+		QSize sizeHint() const override;
+		Qt::Orientation _orientation{ Qt::Horizontal };
+	};
+
+	class LWIDGET_EXPORT LRainbowProgressBar : public LRectProgressBar
+	{
+		Q_OBJECT
+	public:
+		explicit LRainbowProgressBar(QWidget* parent = nullptr)
+			:LRectProgressBar(parent)
+		{
+		}
+		explicit LRainbowProgressBar(const int minimum, const int maximum, QWidget* parent = nullptr)
+			:LRectProgressBar(minimum, maximum, parent)
+		{}
+		explicit LRainbowProgressBar(const LBaseProgressBar* other, QWidget* parent = nullptr)
+			:LRectProgressBar(other, parent)
+		{}
+	protected:
+		void paintEvent(QPaintEvent* event) override;
+	};
 }
