@@ -93,6 +93,7 @@ namespace ljz {
 		void focusInEvent(QFocusEvent* event) override;
 		void keyPressEvent(QKeyEvent* event) override;
 		void handleCursorPositionChanged(int oldPos, int newPos);
+		bool eventFilter(QObject* watched, QEvent* event) override;
 	private:
 		QHostAddress _hostAddress{ "0.0.0.0" };
 		int _currentblock{ 0 };

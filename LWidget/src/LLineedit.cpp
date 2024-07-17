@@ -139,6 +139,7 @@ QValidator::State LHostAddressValidator::validate(QString& input, int& pos) cons
 LHostAddressEdit::LHostAddressEdit(const QHostAddress& hostAddress, QWidget* parent)
 	:QLineEdit(parent)
 {
+	this->installEventFilter(this);
 	this->setValidator(new LHostAddressValidator(this));
 	connect(this, &LHostAddressEdit::cursorPositionChanged, this, &LHostAddressEdit::handleCursorPositionChanged);
 	connect(this, &LHostAddressEdit::selectionChanged, [=]()
@@ -268,7 +269,7 @@ void LHostAddressEdit::handleCursorPositionChanged(int oldPos, int newPos)
 	if (this->hasSelectedText() && this->selectedText() == this->text())
 		return;
 	QStringList ipv4 = (this->text().split("."));
-
+	if (ipv4.length() != 4) return;
 	int pos = newPos;
 	int newBlock;
 	// 判断当前光标位置是否在第几个里面
@@ -284,6 +285,26 @@ void LHostAddressEdit::handleCursorPositionChanged(int oldPos, int newPos)
 		newBlock = 0;
 	if (newBlock != _currentblock)
 		this->setCurrentBlock(newBlock);
+}
+
+bool LHostAddressEdit::eventFilter(QObject* watched, QEvent* event)
+{
+	/*
+	 * 这里拦截了输入法，如果输入的是.，则调用nextBlock(),因为在centos上，无法捕获到
+	 * .键，所以需要在eventFilter中捕获输入的.
+	 */
+	if (event->type() == QEvent::InputMethod)
+	{
+		QInputMethodEvent* inputEvent = static_cast<QInputMethodEvent*>(event);
+		// 判断是不是输入的.
+		if (inputEvent->commitString() == ".")
+		{
+			this->nextBlock();
+			return false;
+		}
+	}
+
+	return QLineEdit::eventFilter(watched, event);
 }
 
 void LHostAddressEdit::nextBlock()
