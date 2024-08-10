@@ -11,10 +11,7 @@
 #include <QWidget>
 #include <QEvent>
 #include <QSpacerItem>
-#ifdef WIN32
-#include <Windows.h>
-#pragma comment (lib,"user32.lib")
-#endif // WIN32
+
 
 namespace ljz
 {

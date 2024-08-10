@@ -3,7 +3,7 @@
 #include <LWidget>
 #include <QLinearGradient>
 #include <QMessageBox>
-
+#include <QNetworkInterface>
 #include "LJsonConfig.h"
 
 Demo::Demo(QWidget* parent)

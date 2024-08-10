@@ -2,8 +2,10 @@
 
 #include "func.h"
 #ifdef WIN32
-#include <windowsx.h>
+#include <Windows.h>
+#pragma comment (lib,"user32.lib")
 #endif // WIN32
+#include <windowsx.h>
 
 using namespace ljz;
 

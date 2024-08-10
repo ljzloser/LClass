@@ -12,6 +12,7 @@
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QPlainTextEdit>
+#include <QAbstractScrollArea>
 
 namespace ljz
 {
@@ -235,5 +236,20 @@ namespace ljz
 
 	public:
 		LTextEdit* codeEditor;
+	};
+	
+	class LTerminalCell:public QStyleOptionViewItem
+	{
+	public:
+		QRect lineRect;
+		
+	};
+	
+	class LWIDGET_EXPORT LTerminalEdit :public QAbstractScrollArea
+	{
+		Q_OBJECT
+	public:
+		explicit LTerminalEdit(QWidget* parent = nullptr);
+		~LTerminalEdit() override = default;
 	};
 }

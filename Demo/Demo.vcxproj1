@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{73CD8F88-6465-4842-A93B-6455577871D0}</ProjectGuid>
+    <ProjectGuid>{FE26B074-7A9B-4ED4-B053-510767AA46B8}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
@@ -19,13 +19,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -36,13 +36,13 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.6.3_msvc2019_64</QtInstall>
-    <QtModules>core;gui;network;widgets;sql;xml</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.6.3_msvc2019_64</QtInstall>
-    <QtModules>core;gui;network;widgets;sql;xml</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -60,23 +60,32 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <IncludePath>$(SolutionDir)LWidget\include;$(SolutionDir)LCore\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LWidget.lib;LCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LWidget.lib;LCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+        cd/d  $(TargetDir)
+        $(QtDllPath)/windeployqt $(TargetFileName)
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>LCORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -89,7 +98,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>LCORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -104,24 +112,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\func.h" />
-    <ClInclude Include="include\LCore" />
-    <ClInclude Include="include\lcore_global.h" />
-    <ClInclude Include="include\LConfig.h" />
-    <ClInclude Include="include\LInIConfig.h" />
-    <ClInclude Include="include\LJsonConfig.h" />
-    <QtMoc Include="include\LSingleApplication.h" />
-    <ClInclude Include="include\LLog.h" />
-    <ClInclude Include="include\LSqlExecutor.h" />
-    <ClInclude Include="include\LXmlConfig.h" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Demo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\func.cpp" />
-    <ClCompile Include="src\LConfig.cpp" />
-    <ClCompile Include="src\LInIConfig.cpp" />
-    <ClCompile Include="src\LJsonConfig.cpp" />
-    <ClCompile Include="src\LSingleApplication.cpp" />
-    <ClCompile Include="src\LXmlConfig.cpp" />
+    <QtUic Include="ui\Demo.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\Demo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="resource\Demo.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LCore\LCore.vcxproj">
+      <Project>{73cd8f88-6465-4842-a93b-6455577871d0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\LWidget\LWidget.vcxproj">
+      <Project>{2cfdc0d1-5848-4e5e-b2ba-211834089636}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -1025,3 +1025,7 @@ void LTextEdit::findItemClicked(FindItemInfo info)
 	scrollValue = vScrollBar->value() + cursorY - this->viewport()->rect().top();
 	vScrollBar->setValue(scrollValue);
 }
+
+ljz::LTerminalEdit::LTerminalEdit(QWidget *parent)
+{
+}

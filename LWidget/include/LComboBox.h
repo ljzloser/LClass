@@ -7,9 +7,6 @@
 #include <QEvent>
 #include <QCompleter>
 #include "LLineedit.h"
-#include <QNetworkInterface>
-
-#include "LJZWidget.h"
 
 namespace ljz
 {
