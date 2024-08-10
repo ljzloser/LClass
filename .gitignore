@@ -377,3 +377,8 @@ FodyWeavers.xsd
 /CMakeLists.txt.user.eede0db
 /CMakePresets.json
 /CMakeUserPresets.json
+/Demo/.idea
+/Demo/cmake-build-debug
+/.vscode/launch.json
+/.idea
+/LWidget/resource
