@@ -174,7 +174,7 @@ LTextEditToolWidget::LTextEditToolWidget(QFrame* parent)
 	layout->setSpacing(0);
 	this->setFrameShape(QFrame::WinPanel);
 
-	_searchLineEdit->setPlaceholderText("查找...");
+	_searchLineEdit->setPlaceholderText("查找...");	
 
 	_comboBox->addItems({ "向下查找", "向上查找" });
 
@@ -960,7 +960,7 @@ void LTextEdit::resizeEvent(QResizeEvent* event)
 	int right = this->verticalScrollBar()->isHidden() ? 0 : this->verticalScrollBar()->width();
 	rect.moveTopRight(this->rect().topRight());
 	rect.moveRight(rect.right() - right - 1);
-	this->_searchToolWidget->setGeometry(rect);
+	// this->_searchToolWidget->setGeometry(rect);
 	QRect cr = contentsRect();
 	_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }

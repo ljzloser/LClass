@@ -6,5 +6,6 @@
 #include "LSingleApplication.h"
 #include "LSqlExecutor.h"
 #include "LLog.h"
+//#include "LInstanceMap.h"
 
 using namespace ljz;
