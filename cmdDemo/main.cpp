@@ -6,7 +6,7 @@ using namespace ljz;
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     Table table;
-    for(int i = 0; i < 100 ; i ++)
+    for(int i = 0; i < 2 ; i ++)
     {
         Task * task1 = new Task();
         task1->start();

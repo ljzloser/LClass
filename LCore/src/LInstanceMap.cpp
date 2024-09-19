@@ -35,12 +35,6 @@ void ljz::LInstanceMap::set(const QString &key, const QVariant &value, bool isRe
 {
     _lock.lockForWrite();
     bool keyExist = this->contains(key);
-    if(lastOp != "remove" && !keyExist)
-    {
-       auto a = 1;
-    }
-    // qDebug() << (keyExist ? "Update" : "Insert");
-    lastOp = (keyExist ? "Update" : "Insert");
 
     Content content(key, value, _map.value(key), keyExist ? Content::Type::Update : Content::Type::Insert);
     content._threadId = static_cast<int>(reinterpret_cast<uintptr_t>(QThread::currentThreadId()));
@@ -48,7 +42,7 @@ void ljz::LInstanceMap::set(const QString &key, const QVariant &value, bool isRe
 
     if (isRegistered(key) || isRegister)
     {
-        emit valueChanged(content);
+        this->valueChange(content);
     }
     _lock.unlock();
     if (isRegister)
@@ -95,14 +89,12 @@ void ljz::LInstanceMap::remove(const QString &key, bool isUnRegister)
         _lock.unlock();
         return;
     }
-    // qDebug() << "remove";
-    lastOp = "remove";
     _map.remove(key);
     if (isRegistered(key))
     {
         Content content(key, QVariant(), _map.value(key), Content::Type::Delete);
         content._threadId = static_cast<int>(reinterpret_cast<uintptr_t>(QThread::currentThreadId()));
-        emit valueChanged(content);
+        this->valueChange(content);
     }
     _lock.unlock();
  
@@ -201,4 +193,13 @@ bool ljz::LInstanceMap::isRegistered(const QString &key)
 {
     QMutexLocker locker(&_mutex);
     return _keySet.contains(key);
+}
+
+void ljz::LInstanceMap::valueChange(Content content)
+{
+    if (content._time < time)
+        qDebug() << "error";
+
+	time = content._time;
+    emit valueChanged(content);
 }

@@ -60,12 +60,13 @@ namespace ljz
     signals:
         void valueChanged(Content content);
     private:
+        void valueChange(Content content);
         QReadWriteLock _lock;
         QMutex _mutex;
         QMap<QString, QVariant> _map; // 实际数据
         QSet<QString> _keySet; // 需要监听的key
         LInstanceMap();
         ~LInstanceMap();
-        QString lastOp;
+        QDateTime time;
     };
 }

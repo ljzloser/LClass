@@ -42,11 +42,14 @@ public:
     ~Table()
     {
     }
+    QDateTime time;
+    QMutex mutex;
     void addRow(const Content &content);
     void removeRow(const Content &content);
     void updateRow(const Content &content);
+public slots:
     void valueChanged(Content content);
-    QString lastOp;
+
 };
 
 
@@ -88,21 +91,27 @@ void Table::updateRow(const Content &content)
     }
 }
 void Table::valueChanged(Content content){
-
+    QMutexLocker locker(&mutex);
+    if(content._time.toMSecsSinceEpoch()<=time.toMSecsSinceEpoch())
+        qDebug() << "error";
+	time = content._time;
+  //  qDebug() << lastOp;
     switch (content._type)
     {
     case Content::Type::Insert:
-        if (lastOp != "removeRow")
-            auto a = 1;
-        lastOp = "addRow";
+    {
+        //if (lastOp != "removeRow")
+        //    qDebug() << "lastOp11111111111111111111111111111111111111111111111111";
+       // lastOp = "addRow";
         this->addRow(content);
         break;
+    }
     case Content::Type::Update:
-        lastOp = "updateRow";
+       // lastOp = "updateRow";
         this->updateRow(content);
         break;
     case Content::Type::Delete:
-        lastOp = "removeRow";
+       // lastOp = "removeRow";
         this->removeRow(content);
         break;
     default:
