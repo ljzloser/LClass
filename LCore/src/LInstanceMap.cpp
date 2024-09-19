@@ -34,7 +34,15 @@ ljz::LInstanceMap& ljz::LInstanceMap::instance()
 void ljz::LInstanceMap::set(const QString &key, const QVariant &value, bool isRegister)
 {
     _lock.lockForWrite();
-    Content content(key, value, _map.value(key), _map.contains(key) ? Content::Type::Update : Content::Type::Insert);
+    bool keyExist = this->contains(key);
+    if(lastOp != "remove" && !keyExist)
+    {
+       auto a = 1;
+    }
+    // qDebug() << (keyExist ? "Update" : "Insert");
+    lastOp = (keyExist ? "Update" : "Insert");
+
+    Content content(key, value, _map.value(key), keyExist ? Content::Type::Update : Content::Type::Insert);
     content._threadId = static_cast<int>(reinterpret_cast<uintptr_t>(QThread::currentThreadId()));
     _map.insert(key, value);
     _lock.unlock();
@@ -81,11 +89,14 @@ ljz::LInstanceMap::~LInstanceMap()
 
 void ljz::LInstanceMap::remove(const QString &key, bool isUnRegister)
 {
+    _lock.lockForWrite();
     if (!this->contains(key))
     {
+        _lock.unlock();
         return;
     }
-    _lock.lockForWrite();
+    // qDebug() << "remove";
+    lastOp = "remove";
     _map.remove(key);
     if (isRegistered(key))
     {

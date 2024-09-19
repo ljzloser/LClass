@@ -26,9 +26,9 @@ void Task::run()
 {
     while (true)
     {
-        QThread::msleep(10);
-        LInstanceMap::instance().set(QString::number(QRandomGenerator::global()->bounded(0,20)),QRandomGenerator::global()->generate(),true);
-        LInstanceMap::instance().remove(QString::number(QRandomGenerator::global()->bounded(0,2)));
+        QThread::msleep(2000);
+        LInstanceMap::instance().set(QString::number(QRandomGenerator::global()->bounded(0,1)),QRandomGenerator::global()->generate(),true);
+        LInstanceMap::instance().remove(QString::number(QRandomGenerator::global()->bounded(0,1)));
     }
 }
 class Table: public QTableWidget
@@ -46,6 +46,7 @@ public:
     void removeRow(const Content &content);
     void updateRow(const Content &content);
     void valueChanged(Content content);
+    QString lastOp;
 };
 
 
@@ -91,12 +92,17 @@ void Table::valueChanged(Content content){
     switch (content._type)
     {
     case Content::Type::Insert:
+        if (lastOp != "removeRow")
+            auto a = 1;
+        lastOp = "addRow";
         this->addRow(content);
         break;
     case Content::Type::Update:
+        lastOp = "updateRow";
         this->updateRow(content);
         break;
     case Content::Type::Delete:
+        lastOp = "removeRow";
         this->removeRow(content);
         break;
     default:

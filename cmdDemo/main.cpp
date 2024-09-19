@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         task1->start();
     }
 
-    QObject::connect(&LInstanceMap::instance(), &LInstanceMap::valueChanged, &table, &Table::valueChanged);
+    QObject::connect(&LInstanceMap::instance(), &LInstanceMap::valueChanged, &table, &Table::valueChanged,Qt::QueuedConnection);
     table.show();
     return a.exec();
 }

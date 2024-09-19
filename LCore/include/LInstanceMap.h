@@ -66,5 +66,6 @@ namespace ljz
         QSet<QString> _keySet; // 需要监听的key
         LInstanceMap();
         ~LInstanceMap();
+        QString lastOp;
     };
 }
