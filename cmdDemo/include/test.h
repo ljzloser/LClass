@@ -26,7 +26,7 @@ void Task::run()
 {
     while (true)
     {
-        QThread::msleep(2000);
+        QThread::msleep(100);
         LInstanceMap::instance().set(QString::number(QRandomGenerator::global()->bounded(0,1)),QRandomGenerator::global()->generate(),true);
         LInstanceMap::instance().remove(QString::number(QRandomGenerator::global()->bounded(0,1)));
     }

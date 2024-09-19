@@ -45,12 +45,12 @@ void ljz::LInstanceMap::set(const QString &key, const QVariant &value, bool isRe
     Content content(key, value, _map.value(key), keyExist ? Content::Type::Update : Content::Type::Insert);
     content._threadId = static_cast<int>(reinterpret_cast<uintptr_t>(QThread::currentThreadId()));
     _map.insert(key, value);
-    _lock.unlock();
+
     if (isRegistered(key) || isRegister)
     {
         emit valueChanged(content);
     }
-
+    _lock.unlock();
     if (isRegister)
     {
         this->registerKey(QStringList() << key);
